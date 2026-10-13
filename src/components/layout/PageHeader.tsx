@@ -1,4 +1,5 @@
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Reveal, RevealWords } from "@/components/motion/Reveal";
 
 export function PageHeader({
   crumbs,
@@ -16,12 +17,28 @@ export function PageHeader({
   children?: React.ReactNode;
 }) {
   return (
-    <header className="container-x pt-8 pb-10">
-      <Breadcrumbs items={crumbs} label={crumbsLabel} />
-      {eyebrow && <p className="eyebrow mt-10">{eyebrow}</p>}
-      <h1 className={`display-2 max-w-4xl ${eyebrow ? "mt-3" : "mt-10"}`}>{title}</h1>
-      {lead && <p className="lead mt-5 max-w-2xl">{lead}</p>}
-      {children}
+    <header className="relative border-b border-line">
+      <div className="paper-grid pointer-events-none absolute inset-0 opacity-60" aria-hidden="true" />
+      <div className="container-x relative pt-8 pb-14 sm:pb-20">
+        <Breadcrumbs items={crumbs} label={crumbsLabel} />
+        <div className="mt-12 grid gap-8 lg:mt-16 lg:grid-cols-[1.5fr_1fr] lg:items-end">
+          <div>
+            {eyebrow && (
+              <Reveal kind="fade" className="mb-5 flex items-center gap-3">
+                <span className="h-px w-10 bg-bronze" />
+                <span className="eyebrow">{eyebrow}</span>
+              </Reveal>
+            )}
+            <RevealWords as="h1" text={title} className="display-1 max-w-4xl !text-[40px] sm:!text-[56px] lg:!text-[72px]" />
+          </div>
+          {lead && (
+            <Reveal kind="up" delay={250}>
+              <p className="lead max-w-md lg:mb-3">{lead}</p>
+            </Reveal>
+          )}
+        </div>
+        {children}
+      </div>
     </header>
   );
 }

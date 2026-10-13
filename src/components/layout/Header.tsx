@@ -12,6 +12,7 @@ import { Icon } from "@/components/ui/icons";
 import { Badge } from "@/components/ui/feedback";
 import { Modal } from "@/components/ui/Modal";
 import { Logo } from "./Logo";
+import { rememberScroll } from "./ScrollRestore";
 
 export function Header() {
   const { locale, dict } = useI18n();
@@ -35,7 +36,7 @@ export function Header() {
   }, [pathname]);
   useEffect(() => setOpen(false), [pathname]);
 
-  const dark = home && atTop;
+  const dark = false; // all heroes are light now
   const L = (p: string) => `/${locale}${p}`;
   const primary = [
     { href: "/catalog/", label: dict.nav.catalog },
@@ -52,6 +53,14 @@ export function Header() {
     { href: "/contacts/", label: dict.nav.contacts },
   ];
   const switchTo = (l: string) => pathname.replace(new RegExp(`^/${locale}(?=/|$)`), `/${l}`);
+  const router = useRouter();
+  const goLocale = (e: React.MouseEvent, l: string) => {
+    e.preventDefault();
+    if (l === locale) return;
+    rememberScroll(pathname);
+    // keep query (filters, project id, calculator mode); state lives in session storage
+    router.push(switchTo(l) + window.location.search, { scroll: false });
+  };
   const isActive = (href: string) => pathname.startsWith(L(href).replace(/\/$/, ""));
 
   return (
@@ -74,7 +83,8 @@ export function Header() {
               <Link
                 key={n.href}
                 href={L(n.href)}
-                className={`text-[13px] tracking-wide transition-opacity hover:opacity-100 ${isActive(n.href) ? "opacity-100 underline decoration-bronze underline-offset-8" : "opacity-75"}`}
+                aria-current={isActive(n.href) ? "page" : undefined}
+                className={`u-line text-[13px] tracking-wide transition-opacity duration-300 hover:opacity-100 ${isActive(n.href) ? "opacity-100" : "opacity-70"}`}
               >
                 {n.label}
               </Link>
@@ -95,18 +105,26 @@ export function Header() {
             <Link href={L("/projects/")} className="hidden h-10 w-10 items-center justify-center hover:opacity-70 sm:inline-flex" aria-label={dict.nav.projects}>
               <Icon name="folder" />
             </Link>
-            <div className="ml-1 hidden items-center border-l border-current/20 pl-3 text-xs sm:flex" role="group" aria-label={dict.nav.language}>
-              {LOCALES.map((l) => (
-                <Link
-                  key={l}
-                  href={switchTo(l)}
-                  hrefLang={l}
-                  aria-current={l === locale ? "true" : undefined}
-                  className={`px-1.5 py-1 uppercase tracking-widest ${l === locale ? "font-semibold" : "opacity-55 hover:opacity-100"}`}
-                >
-                  {l}
-                </Link>
-              ))}
+            <div className="ml-2 hidden sm:block" role="group" aria-label={dict.nav.language}>
+              <div className="relative flex border border-line-strong p-0.5 text-[11px]">
+                <span
+                  aria-hidden="true"
+                  className="absolute top-0.5 bottom-0.5 left-0.5 bg-ink transition-transform duration-500 ease-[var(--ease-out-expo)]"
+                  style={{ width: `calc((100% - 4px) / ${LOCALES.length})`, transform: `translateX(${LOCALES.indexOf(locale) * 100}%)` }}
+                />
+                {LOCALES.map((l) => (
+                  <a
+                    key={l}
+                    href={switchTo(l)}
+                    hrefLang={l}
+                    onClick={(e) => goLocale(e, l)}
+                    aria-current={l === locale ? "true" : undefined}
+                    className={`relative z-10 w-9 py-1 text-center font-medium tracking-widest uppercase transition-colors duration-300 ${l === locale ? "text-white" : "text-ink-3 hover:text-ink"}`}
+                  >
+                    {l === "kk" ? "kz" : l}
+                  </a>
+                ))}
+              </div>
             </div>
             <button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 w-10 items-center justify-center xl:hidden" aria-label={dict.nav.menu} aria-expanded={open}>
               <Icon name="menu" />
@@ -143,7 +161,7 @@ export function Header() {
             </ul>
             <div className="mt-auto flex gap-2 pt-8">
               {LOCALES.map((l) => (
-                <Link key={l} href={switchTo(l)} className={`border px-3 py-1.5 text-xs uppercase tracking-widest ${l === locale ? "border-ink bg-ink text-white" : "border-line-strong"}`}>
+                <Link key={l} href={switchTo(l)} onClick={(e) => goLocale(e, l)} className={`border px-3 py-1.5 text-xs uppercase tracking-widest ${l === locale ? "border-ink bg-ink text-white" : "border-line-strong"}`}>
                   {l === "ru" ? "Русский" : "Қазақша"}
                 </Link>
               ))}

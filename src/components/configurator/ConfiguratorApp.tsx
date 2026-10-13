@@ -11,6 +11,7 @@ import { newSelection } from "@/domain/placement-defaults";
 import { projectProvider } from "@/lib/projects";
 import { loadCurrentProject, newTypicalProject, saveProject } from "@/lib/project-actions";
 import { useProjectState } from "@/lib/use-project";
+import { useSessionState } from "@/lib/session-state";
 import { useCatalog } from "@/lib/catalog-context";
 import { useI18n } from "@/lib/i18n-context";
 import { fmtMoney, format, lt } from "@/i18n";
@@ -47,8 +48,8 @@ export function ConfiguratorApp() {
   const [typical, setTypical] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const { project, variant, estimate, updateVariant, updateProject, status } = useProjectState(initial);
-  const [tab, setTab] = useState<Tab>("decor");
-  const [view, setView] = useState<ViewPreset>("iso");
+  const [tab, setTab] = useSessionState<Tab>("fd.cfg.tab", "decor");
+  const [view, setView] = useSessionState<ViewPreset>("fd.cfg.view", "iso");
   const [viewNonce, setViewNonce] = useState(0);
   const [gl, setGl] = useState<boolean | null>(null);
   const [specOpen, setSpecOpen] = useState(true);

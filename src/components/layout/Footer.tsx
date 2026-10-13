@@ -8,6 +8,7 @@ export function Footer() {
   const { locale, dict } = useI18n();
   const pathname = usePathname() ?? "";
   if (pathname.includes("/configurator")) return null;
+  const home = /^\/(ru|kk)\/?$/.test(pathname);
   const L = (p: string) => `/${locale}${p}`;
   const cols = [
     [
@@ -33,7 +34,7 @@ export function Footer() {
     ],
   ];
   return (
-    <footer className="no-print mt-24 bg-ink text-white/70">
+    <footer className={`no-print bg-ink text-white/70 ${home ? "border-t border-white/10" : "mt-24"}`}>
       <div className="container-x grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="space-y-4">
           <Logo light />

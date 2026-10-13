@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { AdaptiveDpr, OrbitControls, PerformanceMonitor } from "@react-three/drei";
+import { Grounds, InvalidateOnLoad, Post, Sky, Sun, stageSize } from "./SceneStage";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import type { Product, Variant } from "@/domain/types";
@@ -49,75 +50,46 @@ function CameraRig({ variant, view, nonce }: { variant: Variant; view: ViewPrese
   return null;
 }
 
-function Lights({ evening, shadows, size }: { evening: boolean; shadows: boolean; size: number }) {
-  const sun = useRef<THREE.DirectionalLight>(null);
-  useEffect(() => {
-    const s = sun.current;
-    if (!s) return;
-    const c = s.shadow.camera;
-    c.left = c.bottom = -size;
-    c.right = c.top = size;
-    c.updateProjectionMatrix();
-  }, [size]);
-  return evening ? (
-    <>
-      <hemisphereLight args={["#2b3b5c", "#0d0d10", 0.55]} />
-      <directionalLight ref={sun} position={[-14, 6, 10]} intensity={0.9} color="#ff9f5a" castShadow={shadows} shadow-mapSize={[1024, 1024]} />
-      <pointLight position={[0, 1.2, size * 0.6]} intensity={30} distance={14} color="#ffc27a" />
-    </>
-  ) : (
-    <>
-      <hemisphereLight args={["#e8eef5", "#b9a98f", 0.95]} />
-      <directionalLight ref={sun} position={[12, 18, 14]} intensity={2.4} color="#fff4e2" castShadow={shadows} shadow-mapSize={[2048, 2048]} shadow-bias={-0.0004} />
-    </>
-  );
-}
-
 export function FacadeScene({
   variant,
   product,
   view,
   viewNonce,
   className = "",
+  highlightId = null,
 }: {
   variant: Variant;
   product: (id: string) => Product | undefined;
   view: ViewPreset;
   viewNonce: number;
   className?: string;
+  highlightId?: string | null;
 }) {
   const [tier] = useState(() => deviceTier());
   const [degraded, setDegraded] = useState(false);
   const low = tier === "low" || degraded;
   const evening = variant.scene.lighting === "evening";
   const initial = useMemo(() => presetPose(variant, "iso"), []); // eslint-disable-line react-hooks/exhaustive-deps
-  const size = Math.max(variant.geometry.length, variant.geometry.depth) + 6;
+  const size = stageSize(variant.geometry);
   return (
     <Canvas
       className={className}
-      shadows={!low}
+      shadows={low ? false : "soft"}
       frameloop="demand"
       dpr={low ? [1, 1.25] : [1, 1.75]}
-      gl={{ antialias: !low, powerPreference: "high-performance", preserveDrawingBuffer: false }}
-      camera={{ position: initial.pos.toArray(), fov: 38, near: 0.1, far: 400 }}
-      onCreated={({ gl }) => {
-        gl.toneMapping = THREE.ACESFilmicToneMapping;
-        gl.toneMappingExposure = evening ? 0.9 : 1.05;
-      }}
+      gl={{ antialias: low, powerPreference: "high-performance", preserveDrawingBuffer: false }}
+      camera={{ position: initial.pos.toArray(), fov: 34, near: 0.1, far: 600 }}
     >
-      <color attach="background" args={[evening ? "#0f141c" : "#e9e5dd"]} />
-      <fog attach="fog" args={[evening ? "#0f141c" : "#e9e5dd", 60, 160]} />
+      <InvalidateOnLoad />
       <PerformanceMonitor onDecline={() => setDegraded(true)} />
       <AdaptiveDpr pixelated={false} />
-      <Lights evening={evening} shadows={!low} size={size} />
-      <HouseModel variant={variant} product={product} lowDetail={low} />
-      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow={!low}>
-        <circleGeometry args={[size * 4, 48]} />
-        <meshStandardMaterial color={evening ? "#1d2027" : "#d9d2c3"} roughness={1} />
-      </mesh>
-      <gridHelper args={[size * 3, Math.round(size * 3), evening ? "#2a303b" : "#cbc2b1", evening ? "#22272f" : "#d4ccbd"]} position={[0, 0.005, 0]} />
-      <OrbitControls makeDefault enableDamping={false} maxPolarAngle={Math.PI / 2 - 0.03} minDistance={4} maxDistance={90} target={initial.target} />
+      <Sky lighting={variant.scene.lighting} />
+      <Sun lighting={variant.scene.lighting} size={size} shadows={!low} />
+      <HouseModel variant={variant} product={product} lowDetail={low} highlightId={highlightId} />
+      <Grounds g={variant.geometry} shadows={!low} />
+      <OrbitControls makeDefault enableDamping dampingFactor={0.12} maxPolarAngle={Math.PI / 2 - 0.04} minDistance={4} maxDistance={90} target={initial.target} />
       <CameraRig variant={variant} view={view} nonce={viewNonce} />
+      <Post evening={evening} enabled={!low} />
     </Canvas>
   );
 }

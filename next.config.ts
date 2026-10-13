@@ -10,6 +10,8 @@ const config: NextConfig = {
   trailingSlash: true,
   images: { unoptimized: true },
   reactStrictMode: true,
+  // `*.dev.tsx` pages (the render lab) exist only in development builds
+  pageExtensions: process.env.NODE_ENV === "development" ? ["dev.tsx", "tsx", "ts"] : ["tsx", "ts"],
 };
 
 export default config;

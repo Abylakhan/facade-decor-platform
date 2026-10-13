@@ -45,6 +45,34 @@ export function villaVariant(): Variant {
   return v;
 }
 
+/** Facade used for the home-page drawing: hip roof, portico, rich but legible decor. */
+export function heroFacade(): Variant {
+  const g = generateGeometry({
+    length: 16,
+    depth: 11,
+    floors: 2,
+    floorHeight: 3.5,
+    plinthHeight: 0.7,
+    facadeSides: 4,
+    windowsPerFloorFront: 4,
+    windowsPerFloorSide: 2,
+    windowWidth: 1.3,
+    windowHeight: 2.1,
+    doorWidth: 1.6,
+    doorHeight: 2.8,
+  });
+  g.roof = { type: "hip", pitchDeg: 24, overhang: 0.6 };
+  return createVariant("Hero", g, [
+    { id: uid("s"), productId: "p-k300", enabled: true, placement: { kind: "eaves", sides: [...ALL] } },
+    { id: uid("s"), productId: "p-b1", enabled: true, placement: { kind: "brackets", sides: ["front"], spacing: 1.1 } },
+    { id: uid("s"), productId: "p-w180k", enabled: true, placement: { kind: "window-surround", sides: [...ALL], scheme: "4" } },
+    { id: uid("s"), productId: "p-pb150", enabled: true, placement: { kind: "belt", sides: [...ALL] } },
+    { id: uid("s"), productId: "p-pl200", enabled: true, placement: { kind: "plinth", sides: [...ALL] } },
+    { id: uid("s"), productId: "p-rq", enabled: true, placement: { kind: "quoins", corners: ["front-right", "left-front"] } },
+    { id: uid("s"), productId: "p-c300", enabled: true, placement: { kind: "column", count: 2, height: 3.4 } },
+  ]);
+}
+
 function mansion(): Variant {
   const g = generateGeometry({
     length: 14,

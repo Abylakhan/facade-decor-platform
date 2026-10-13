@@ -7,6 +7,7 @@ import { CatalogDataProvider } from "@/lib/catalog-context";
 import { ToastProvider } from "@/components/ui/Toast";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { ScrollRestore } from "@/components/layout/ScrollRestore";
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -27,6 +28,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
             {dict.nav.skip}
           </a>
           <Header />
+          <ScrollRestore />
           <div id="main">{children}</div>
           <Footer />
         </ToastProvider>

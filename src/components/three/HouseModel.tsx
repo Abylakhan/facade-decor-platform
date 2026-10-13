@@ -5,15 +5,15 @@
  * lines, eaves, corners) — the same data the calculator uses.
  */
 import { useEffect, useMemo, useRef, type MutableRefObject } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type { DecorSelection, HouseGeometry, Product, Side, Variant } from "@/domain/types";
 import { SIDES } from "@/domain/types";
 import { CORNER_SIDES, wallFrame, wallHeight, wallLength } from "@/domain/calc/geometry";
 import { bracketPositions, columnPositions, openingBoxes, pilasterPositions } from "@/domain/calc/layout";
-import { profileGeometry, roofGeometry, wallGeometry } from "./geometry3d";
-import { wallTexture } from "./textures";
+import { metricBox, profileGeometry, roofGeometry, wallGeometry } from "./geometry3d";
+import { HIGHLIGHT, WALL_SETS, applySet, pbrSet, wallTint } from "./pbr";
 
 export interface HouseFx {
   /** 0..1 how much of the blueprint edges is drawn */
@@ -29,7 +29,7 @@ interface Mats {
   plinth: THREE.MeshStandardMaterial;
   decor: THREE.MeshStandardMaterial;
   roof: THREE.MeshStandardMaterial;
-  glass: THREE.MeshStandardMaterial;
+  glass: THREE.MeshPhysicalMaterial;
   frame: THREE.MeshStandardMaterial;
   door: THREE.MeshStandardMaterial;
 }
@@ -43,36 +43,71 @@ export function HouseModel({
   product,
   fxRef,
   lowDetail = false,
+  highlightId = null,
 }: {
   variant: Variant;
   product: (id: string) => Product | undefined;
   fxRef?: MutableRefObject<HouseFx>;
   lowDetail?: boolean;
+  /** Selection to emphasise in the scene (e.g. while it is edited in the panel). */
+  highlightId?: string | null;
 }) {
   const g = variant.geometry;
   const scene = variant.scene;
   const evening = scene.lighting === "evening";
 
+  const invalidate = useThree((st) => st.invalidate);
+  // Materials are rebuilt only when the texture set or lighting changes;
+  // colours change smoothly in useFrame (see useColourTransition).
   const mats = useMemo<Mats>(() => {
+    const ws = WALL_SETS[scene.wallMaterial];
     const m: Mats = {
-      wall: new THREE.MeshStandardMaterial({ color: scene.facadeColor, map: typeof document !== "undefined" ? wallTexture(scene.wallMaterial) : null, roughness: 0.92 }),
-      plinth: new THREE.MeshStandardMaterial({ color: "#8c857a", roughness: 0.95 }),
-      decor: new THREE.MeshStandardMaterial({ color: scene.decorColor, roughness: 0.55 }),
-      roof: new THREE.MeshStandardMaterial({ color: scene.roofColor, roughness: 0.75, side: THREE.DoubleSide }),
-      glass: new THREE.MeshStandardMaterial({
-        color: evening ? "#3a2a12" : "#7d93a1",
-        emissive: evening ? "#ffb85c" : "#000000",
-        emissiveIntensity: evening ? 1.1 : 0,
-        roughness: 0.08,
-        metalness: 0.6,
+      wall: applySet(new THREE.MeshStandardMaterial(), pbrSet(ws.id, ws.tile), 1),
+      plinth: applySet(new THREE.MeshStandardMaterial(), pbrSet("castle_brick_02_white", 1.1), 1.2),
+      decor: applySet(new THREE.MeshStandardMaterial(), pbrSet("beige_wall_001", 0.7), 0.5),
+      roof: applySet(new THREE.MeshStandardMaterial({ side: THREE.DoubleSide }), pbrSet("grey_roof_tiles_02", 1.6), 1.2),
+      glass: new THREE.MeshPhysicalMaterial({
+        color: evening ? "#3a2810" : "#a9bcc8",
+        emissive: evening ? "#ffb35a" : "#000000",
+        emissiveIntensity: evening ? 1.6 : 0,
+        roughness: 0.04,
+        metalness: evening ? 0.3 : 0.88,
+        envMapIntensity: 1.25,
       }),
-      frame: new THREE.MeshStandardMaterial({ color: "#2b2a27", roughness: 0.5 }),
-      door: new THREE.MeshStandardMaterial({ color: "#4a3b2e", roughness: 0.6 }),
+      frame: new THREE.MeshStandardMaterial({ color: "#2e2c29", roughness: 0.38, metalness: 0.4 }),
+      door: new THREE.MeshStandardMaterial({ color: "#3a2a1e", roughness: 0.42, metalness: 0.05 }),
     };
-    for (const mat of Object.values(m)) mat.userData.base = mat.color.clone();
+    m.decor.map = null; // painted decor: relief from the normal map, colour from the palette
+    m.plinth.color.set("#a29b90");
+    for (const mat of Object.values(m)) mat.userData.target = mat.color.clone();
     return m;
-  }, [scene.facadeColor, scene.decorColor, scene.roofColor, scene.wallMaterial, evening]);
+  }, [scene.wallMaterial, evening]);
   useEffect(() => () => Object.values(mats).forEach((m) => m.dispose()), [mats]);
+
+  // colour targets from the palette
+  useEffect(() => {
+    wallTint(scene.wallMaterial, scene.facadeColor, mats.wall.userData.target as THREE.Color);
+    (mats.decor.userData.target as THREE.Color).set(scene.decorColor);
+    (mats.roof.userData.target as THREE.Color).set("#ffffff").lerp(new THREE.Color(scene.roofColor), 0.75);
+    if (!fxRef) for (const k of ["wall", "decor", "roof"] as const) if (!mats[k].userData.init) {
+      mats[k].color.copy(mats[k].userData.target as THREE.Color);
+      mats[k].userData.init = true;
+    }
+    invalidate();
+  }, [mats, scene.facadeColor, scene.decorColor, scene.roofColor, scene.wallMaterial, fxRef, invalidate]);
+  useFrame((_, dt) => {
+    if (fxRef) return;
+    let moving = false;
+    const k = 1 - Math.pow(0.002, dt);
+    for (const mat of [mats.wall, mats.decor, mats.roof]) {
+      const t = mat.userData.target as THREE.Color;
+      if (Math.abs(mat.color.r - t.r) + Math.abs(mat.color.g - t.g) + Math.abs(mat.color.b - t.b) > 0.002) {
+        mat.color.lerp(t, k);
+        moving = true;
+      }
+    }
+    if (moving) invalidate();
+  });
 
   const groupRef = useRef<THREE.Group>(null);
   useBlueprintFx(groupRef, fxRef, mats, variant);
@@ -98,10 +133,20 @@ export function HouseModel({
       </mesh>
       <mesh geometry={roof} material={mats.roof} castShadow={shadow} receiveShadow={shadow} />
       {enabled.map((s) => (
-        <Decor key={s.id} sel={s} g={g} product={product} mats={mats} all={enabled} shadow={shadow} />
+        <DecorFade key={s.id} base={mats.decor} highlighted={s.id === highlightId}>
+          {(mat) => <Decor sel={s} g={g} product={product} mats={{ ...mats, decor: mat }} all={enabled} shadow={shadow} />}
+        </DecorFade>
       ))}
     </group>
   );
+}
+
+/** Box mesh with metric UVs (memoised geometry). */
+function MBox({ args, ...rest }: { args: [number, number, number] } & Omit<React.ComponentProps<"mesh">, "args">) {
+  const [w, h, d] = args;
+  const geo = useMemo(() => metricBox(w, h, d), [w, h, d]);
+  useEffect(() => () => geo.dispose(), [geo]);
+  return <mesh geometry={geo} {...rest} />;
 }
 
 /* ----------------------------------------------------------------- walls */
@@ -123,9 +168,7 @@ function WallBlock({ g, side, mats, shadow }: { g: HouseGeometry; side: Side; ma
     <WallFrame g={g} side={side}>
       <mesh geometry={geo} material={mats.wall} castShadow={shadow} receiveShadow={shadow} />
       {g.plinthHeight > 0 && (
-        <mesh position={[len / 2, g.plinthHeight / 2, 0.03]} material={mats.plinth} receiveShadow={shadow}>
-          <boxGeometry args={[len + 0.06, g.plinthHeight, 0.06]} />
-        </mesh>
+        <MBox args={[len + 0.06, g.plinthHeight, 0.06]} position={[len / 2, g.plinthHeight / 2, 0.03]} material={mats.plinth} receiveShadow={shadow} />
       )}
       {openingBoxes(g, side).map((b) => {
         const w = b.right - b.left;
@@ -135,30 +178,54 @@ function WallBlock({ g, side, mats, shadow }: { g: HouseGeometry; side: Side; ma
         if (b.o.kind === "door") {
           return (
             <group key={b.o.id}>
-              <mesh position={[cx, cy, -0.1]} material={mats.door}>
+              {/* door leaf with raised panels and a glazed top */}
+              <mesh position={[cx, cy, -0.16]} material={mats.door} castShadow={shadow}>
                 <boxGeometry args={[w, h, 0.06]} />
               </mesh>
-              <mesh position={[cx, b.bottom + h * 0.7, -0.06]} material={mats.glass}>
-                <boxGeometry args={[w * 0.6, h * 0.35, 0.01]} />
+              {[0.28, 0.62].map((f) => (
+                <mesh key={f} position={[cx, b.bottom + h * f, -0.125]} material={mats.door}>
+                  <boxGeometry args={[w * 0.72, h * 0.26, 0.02]} />
+                </mesh>
+              ))}
+              <mesh position={[cx, b.bottom + h * 0.86, -0.12]} material={mats.glass}>
+                <boxGeometry args={[w * 0.72, h * 0.14, 0.01]} />
               </mesh>
+              <mesh position={[cx + w * 0.36, b.bottom + h * 0.48, -0.1]} material={mats.frame}>
+                <sphereGeometry args={[0.03, 12, 8]} />
+              </mesh>
+              {/* stone threshold step */}
+              <MBox args={[w + 0.6, 0.16, 0.5]} position={[cx, b.bottom - 0.08, 0.18]} material={mats.plinth} receiveShadow={shadow} castShadow={shadow} />
             </group>
           );
         }
+        const t = 0.06; // frame profile
         return (
           <group key={b.o.id}>
-            <mesh position={[cx, cy, -0.14]} material={mats.glass}>
+            <mesh position={[cx, cy, -0.18]} material={mats.glass}>
               <planeGeometry args={[w, h]} />
             </mesh>
-            {/* frame + mullion + transom */}
-            <mesh position={[cx, cy, -0.12]} material={mats.frame}>
-              <boxGeometry args={[0.05, h, 0.05]} />
+            {/* outer frame */}
+            <mesh position={[cx, b.top - t / 2, -0.15]} material={mats.frame}>
+              <boxGeometry args={[w, t, 0.07]} />
             </mesh>
-            <mesh position={[cx, b.top - h * 0.3, -0.12]} material={mats.frame}>
-              <boxGeometry args={[w, 0.05, 0.05]} />
+            <mesh position={[cx, b.bottom + t / 2, -0.15]} material={mats.frame}>
+              <boxGeometry args={[w, t, 0.07]} />
             </mesh>
-            <mesh position={[cx, b.bottom - 0.03, 0.03]} material={mats.plinth}>
-              <boxGeometry args={[w + 0.1, 0.05, 0.1]} />
+            <mesh position={[b.left + t / 2, cy, -0.15]} material={mats.frame}>
+              <boxGeometry args={[t, h, 0.07]} />
             </mesh>
+            <mesh position={[b.right - t / 2, cy, -0.15]} material={mats.frame}>
+              <boxGeometry args={[t, h, 0.07]} />
+            </mesh>
+            {/* casement mullion and transom */}
+            <mesh position={[cx, cy, -0.16]} material={mats.frame}>
+              <boxGeometry args={[0.045, h, 0.05]} />
+            </mesh>
+            <mesh position={[cx, b.top - h * 0.28, -0.16]} material={mats.frame}>
+              <boxGeometry args={[w, 0.045, 0.05]} />
+            </mesh>
+            {/* stone sill with drip */}
+            <MBox args={[w + 0.14, 0.07, 0.42]} position={[cx, b.bottom - 0.035, 0.02]} material={mats.plinth} castShadow={shadow} />
           </group>
         );
       })}
@@ -395,9 +462,7 @@ function Decor({
       return (
         <WallFrame g={g} side="front">
           {/* porch slab */}
-          <mesh position={[(minU + maxU) / 2, g.plinthHeight / 2, offset / 2 + 0.2]} material={mats.plinth} receiveShadow={shadow} castShadow={shadow}>
-            <boxGeometry args={[maxU - minU + 0.8, g.plinthHeight, offset + 0.4]} />
-          </mesh>
+          <MBox args={[maxU - minU + 0.8, g.plinthHeight, offset + 0.4]} position={[(minU + maxU) / 2, g.plinthHeight / 2, offset / 2 + 0.2]} material={mats.plinth} receiveShadow={shadow} castShadow={shadow} />
           {cols.map((c) => (
             <group key={c.u} position={[c.u, g.plinthHeight, offset]}>
               <mesh position={[0, 0.08, 0]} material={mat} castShadow={shadow}>
@@ -450,6 +515,39 @@ function Decor({
 
 const lowGeom = (hi: boolean) => (hi ? 28 : 14);
 
+/**
+ * Per-selection material that follows the shared decor material (colour, blueprint
+ * fade) and adds a soft appear animation and a bronze highlight while edited.
+ */
+function DecorFade({ base, highlighted, children }: { base: THREE.MeshStandardMaterial; highlighted: boolean; children: (m: THREE.MeshStandardMaterial) => React.ReactNode }) {
+  const invalidate = useThree((st) => st.invalidate);
+  const mat = useMemo(() => {
+    const m = base.clone();
+    m.transparent = true;
+    m.opacity = 0;
+    m.userData.appear = 0;
+    m.userData.glow = 0;
+    return m;
+  }, [base]);
+  useEffect(() => () => mat.dispose(), [mat]);
+  useEffect(() => invalidate(), [highlighted, invalidate]);
+  useFrame((_, dt) => {
+    const k = 1 - Math.pow(0.001, dt);
+    const appear = (mat.userData.appear as number) + (1 - (mat.userData.appear as number)) * k;
+    const glow = (mat.userData.glow as number) + ((highlighted ? 1 : 0) - (mat.userData.glow as number)) * k;
+    mat.userData.appear = appear > 0.995 ? 1 : appear;
+    mat.userData.glow = Math.abs(glow - (highlighted ? 1 : 0)) < 0.005 ? (highlighted ? 1 : 0) : glow;
+    mat.color.copy(base.color);
+    mat.opacity = base.opacity * (mat.userData.appear as number);
+    mat.transparent = mat.opacity < 0.999 || base.transparent;
+    mat.depthWrite = base.depthWrite && mat.opacity > 0.95;
+    mat.visible = base.visible;
+    mat.emissive.copy(HIGHLIGHT).multiplyScalar(0.35 * (mat.userData.glow as number));
+    if (mat.userData.appear !== 1 || (mat.userData.glow !== 0 && mat.userData.glow !== 1)) invalidate();
+  });
+  return <>{children(mat)}</>;
+}
+
 /* ------------------------------------------------- blueprint → material fx */
 
 function useBlueprintFx(groupRef: React.RefObject<THREE.Group | null>, fxRef: MutableRefObject<HouseFx> | undefined, mats: Mats, variant: Variant) {
@@ -494,7 +592,7 @@ function useBlueprintFx(groupRef: React.RefObject<THREE.Group | null>, fxRef: Mu
       m.opacity = solid;
       m.depthWrite = solid > 0.95;
       m.visible = solid > 0.01;
-      m.color.lerpColors(blue, m.userData.base as THREE.Color, material);
+      m.color.lerpColors(blue, m.userData.target as THREE.Color, material);
     }
     lineMat.opacity = Math.min(1, lines * 1.2) * (1 - material * 0.9);
     lineMat.visible = lineMat.opacity > 0.01;

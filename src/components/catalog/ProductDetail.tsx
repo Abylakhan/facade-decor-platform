@@ -7,6 +7,7 @@ import { format, lt } from "@/i18n";
 import { useI18n } from "@/lib/i18n-context";
 import { useCatalog } from "@/lib/catalog-context";
 import { ProductDrawing } from "@/components/drawings/ProductDrawing";
+import { productImage } from "@/lib/renders";
 import { Alert, Badge, Skeleton } from "@/components/ui/feedback";
 import { Tabs } from "@/components/ui/Tabs";
 import { LeadModalButton } from "@/components/forms/LeadModalButton";
@@ -21,7 +22,7 @@ const Preview3D = dynamic(() => import("@/components/three/ProductPreview3D"), {
 export function ProductDetail({ product }: { product: Product }) {
   const { locale, dict } = useI18n();
   const { product: find, price } = useCatalog();
-  const [tab, setTab] = useState<"drawing" | "3d">("drawing");
+  const [tab, setTab] = useState<"render" | "drawing" | "3d">("render");
   const [gl, setGl] = useState(false);
   useEffect(() => setGl(hasWebGL()), []);
   const related = [...new Set([...(product.related ?? []), ...(product.compatibleWith ?? [])])].map(find).filter((p): p is Product => !!p);
@@ -36,12 +37,22 @@ export function ProductDetail({ product }: { product: Product }) {
             value={tab}
             onChange={setTab}
             tabs={[
+              { id: "render", label: locale === "kk" ? "Визуализация" : "Визуализация" },
               { id: "drawing", label: product.linear ? dict.product.profileDrawing : dict.product.drawing },
               ...(gl ? [{ id: "3d" as const, label: dict.product.preview3d }] : []),
             ]}
           />
-          <div className="paper-grid mt-4 flex aspect-[4/3] items-center justify-center border border-line bg-white p-8">
-            {tab === "drawing" ? <ProductDrawing product={product} className="h-full w-full" title={dict.product.drawing} /> : <Preview3D product={product} />}
+          <div key={tab} className="page-in relative mt-4 aspect-[4/3] overflow-hidden border border-line bg-white">
+            {tab === "render" ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={productImage(product)} alt={lt(product.name, locale)} className="h-full w-full object-cover" />
+            ) : tab === "drawing" ? (
+              <div className="paper-grid flex h-full items-center justify-center p-8">
+                <ProductDrawing product={product} className="h-full w-full" title={dict.product.drawing} />
+              </div>
+            ) : (
+              <Preview3D product={product} />
+            )}
           </div>
           <p className="mt-3 text-xs text-ink-4">{dict.product.photosMissing}</p>
         </div>

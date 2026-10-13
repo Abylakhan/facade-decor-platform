@@ -1,7 +1,9 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { HeroIntro } from "@/components/home/HeroIntro";
+import { HeroDrawing } from "@/components/home/HeroDrawing";
+import { CategoryIndex, DetailsShowcase } from "@/components/home/HomeSections";
 import { PresetTeaser } from "@/components/home/PresetTeaser";
+import { Reveal, RevealWords } from "@/components/motion/Reveal";
 import { buttonClass } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/icons";
 import { providers } from "@/integration/server";
@@ -11,124 +13,137 @@ import { meta, pageLocale, type LocaleParams } from "@/lib/page";
 
 export async function generateMetadata({ params }: LocaleParams): Promise<Metadata> {
   const { locale, dict } = await pageLocale(params);
-  return { ...meta(locale, "/", `${dict.meta.siteName} — ${dict.meta.tagline}`), title: { absolute: `${dict.meta.siteName} — ${dict.meta.tagline}` } };
+  return { ...meta(locale, "/", `${dict.meta.siteName} — ${dict.meta.tagline}`), title: { absolute: `${dict.meta.siteName} — ${dict.home.heroTitle}` } };
 }
 
 export default async function Home({ params }: LocaleParams) {
   const { locale, dict } = await pageLocale(params);
   const { catalog } = providers();
   const [categories, products] = await Promise.all([catalog.listCategories(), catalog.listProducts()]);
+  const counts = Object.fromEntries(categories.map((c) => [c.id, products.filter((p) => p.categoryId === c.id).length]));
   const L = (p: string) => `/${locale}${p}`;
   const pillarLinks = ["/catalog/", "/configurator/", "/calculator/"];
   const pillarIcons = ["layers", "cube", "calc"] as const;
 
   return (
     <main>
-      <HeroIntro />
+      <HeroDrawing />
 
-      <section className="container-x grid gap-10 py-24 lg:grid-cols-[1fr_2fr]">
-        <div>
-          <p className="eyebrow">01 · Platform</p>
-          <h2 className="display-2 mt-4">{dict.home.pillarsTitle}</h2>
-        </div>
-        <div className="grid gap-px bg-line sm:grid-cols-3">
-          {dict.home.pillars.map((p, i) => (
-            <Link key={p.title} href={L(pillarLinks[i]!)} className="group flex flex-col gap-4 bg-paper p-6 transition-colors hover:bg-white">
-              <Icon name={pillarIcons[i]!} size={26} className="text-bronze" />
-              <h3 className="font-display text-2xl">{p.title}</h3>
-              <p className="text-sm leading-relaxed text-ink-3">{p.text}</p>
-              <span className="mt-auto text-sm text-ink-2 group-hover:text-bronze">{dict.common.learnMore} →</span>
-            </Link>
-          ))}
+      <DetailsShowcase />
+
+      {/* manifesto + tools */}
+      <section className="container-x py-24 sm:py-32">
+        <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
+          <div>
+            <Reveal kind="fade">
+              <p className="eyebrow">01 · Platform</p>
+            </Reveal>
+            <RevealWords text={dict.home.pillarsTitle} className="display-2 mt-5" />
+          </div>
+          <ol className="divide-y divide-line border-y border-line">
+            {dict.home.pillars.map((p, i) => (
+              <Reveal as="li" key={p.title} kind="up" delay={i * 90}>
+                <Link href={L(pillarLinks[i]!)} className="group grid grid-cols-[40px_1fr_auto] items-start gap-5 py-7">
+                  <Icon name={pillarIcons[i]!} size={24} className="mt-1 text-bronze" />
+                  <span>
+                    <span className="block font-display text-[28px] leading-tight">{p.title}</span>
+                    <span className="mt-2 block max-w-lg text-sm leading-relaxed text-ink-3">{p.text}</span>
+                  </span>
+                  <Icon name="arrow" className="mt-2 transition-transform duration-500 group-hover:translate-x-1.5" />
+                </Link>
+              </Reveal>
+            ))}
+          </ol>
         </div>
       </section>
 
-      <section className="border-y border-line bg-white py-24">
+      <section className="border-t border-line bg-white py-24 sm:py-32">
         <div className="container-x">
-          <div className="flex flex-wrap items-end justify-between gap-6">
+          <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
             <div>
-              <p className="eyebrow">02 · Catalog</p>
-              <h2 className="display-2 mt-4">{dict.home.categoriesTitle}</h2>
+              <Reveal kind="fade">
+                <p className="eyebrow">02 · Catalog</p>
+              </Reveal>
+              <RevealWords text={dict.home.categoriesTitle} className="display-2 mt-5" />
             </div>
             <Link href={L("/catalog/")} className={buttonClass("secondary")}>
               {dict.nav.catalog} →
             </Link>
           </div>
-          <ul className="mt-12 grid grid-cols-2 gap-px bg-line sm:grid-cols-3 lg:grid-cols-4">
-            {categories
-              .filter((c) => c.id !== "accessories")
-              .map((c, i) => {
-                const count = products.filter((p) => p.categoryId === c.id).length;
-                return (
-                  <li key={c.id} className="bg-white">
-                    <Link href={L(`/catalog/${c.slug}/`)} className="group flex h-full flex-col justify-between gap-6 p-5 transition-colors hover:bg-paper">
-                      <span className="dim">{String(i + 1).padStart(2, "0")}</span>
-                      <span>
-                        <span className="block font-display text-[22px] leading-tight group-hover:text-bronze">{lt(c.name, locale)}</span>
-                        <span className="mt-1 block text-xs text-ink-4">{dict.catalog.categoryCount.replace("{count}", String(count))}</span>
-                      </span>
-                    </Link>
-                  </li>
-                );
-              })}
-          </ul>
+          <CategoryIndex categories={categories.filter((c) => c.id !== "accessories")} counts={counts} />
         </div>
       </section>
 
-      <section className="container-x py-24">
-        <p className="eyebrow">03 · Process</p>
-        <h2 className="display-2 mt-4">{dict.home.howTitle}</h2>
-        <ol className="mt-12 grid gap-8 md:grid-cols-4">
+      <section className="container-x py-24 sm:py-32">
+        <Reveal kind="fade">
+          <p className="eyebrow">03 · Process</p>
+        </Reveal>
+        <RevealWords text={dict.home.howTitle} className="display-2 mt-5" />
+        <ol className="mt-14 grid gap-10 md:grid-cols-4">
           {dict.home.how.map((s, i) => (
-            <li key={s.title} className="border-t border-ink pt-5">
-              <span className="font-display text-5xl text-bronze">{i + 1}</span>
-              <h3 className="mt-3 text-lg font-medium">{s.title}</h3>
+            <Reveal as="li" key={s.title} kind="up" delay={i * 110} className="relative pt-6">
+              <Reveal kind="line" delay={i * 110 + 150} className="absolute top-0 left-0 h-px w-full bg-ink">
+                <span />
+              </Reveal>
+              <span className="font-display text-6xl font-light text-bronze">{i + 1}</span>
+              <h3 className="mt-4 text-lg font-medium">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-3">{s.text}</p>
-            </li>
+            </Reveal>
           ))}
         </ol>
       </section>
 
-      <section className="paper-grid border-y border-line py-24">
+      <section className="paper-grid border-y border-line bg-paper py-24 sm:py-32">
         <div className="container-x">
-          <p className="eyebrow">04 · {dict.home.portfolioTitle}</p>
-          <h2 className="display-2 mt-4 mb-12">{dict.home.portfolioTitle}</h2>
-          <PresetTeaser />
+          <Reveal kind="fade">
+            <p className="eyebrow">04 · {dict.home.beforeAfter}</p>
+          </Reveal>
+          <RevealWords text={dict.home.portfolioTitle} className="display-2 mt-5 mb-12" />
+          <Reveal kind="up">
+            <PresetTeaser />
+          </Reveal>
         </div>
       </section>
 
-      <section className="container-x grid gap-10 py-24 lg:grid-cols-[1fr_2fr]">
+      <section className="container-x grid gap-10 py-24 sm:py-32 lg:grid-cols-[1fr_2fr]">
         <div>
-          <p className="eyebrow">05 · FAQ</p>
-          <h2 className="display-2 mt-4">{dict.nav.faq}</h2>
+          <Reveal kind="fade">
+            <p className="eyebrow">05 · FAQ</p>
+          </Reveal>
+          <RevealWords text={dict.nav.faq} className="display-2 mt-5" />
         </div>
         <div className="divide-y divide-line border-y border-line">
-          {faq.slice(0, 4).map((f) => (
-            <details key={f.q.ru} className="group py-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg">
-                {lt(f.q, locale)}
-                <Icon name="plus" className="shrink-0 transition-transform group-open:rotate-45" />
-              </summary>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-3">{lt(f.a, locale)}</p>
-            </details>
+          {faq.slice(0, 4).map((f, i) => (
+            <Reveal key={f.q.ru} kind="up" delay={i * 70}>
+              <details className="group py-5">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg">
+                  {lt(f.q, locale)}
+                  <Icon name="plus" className="shrink-0 transition-transform duration-300 group-open:rotate-45" />
+                </summary>
+                <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-3">{lt(f.a, locale)}</p>
+              </details>
+            </Reveal>
           ))}
         </div>
       </section>
 
-      <section className="bg-ink py-24 text-white">
-        <div className="container-x flex flex-col items-start gap-6 md:flex-row md:items-end md:justify-between">
+      <section className="relative overflow-hidden bg-ink py-28 text-white sm:py-36">
+        <div className="blueprint-grid pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />
+        <div className="container-x relative flex flex-col items-start gap-8 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="display-2 !text-white">{dict.home.ctaTitle}</h2>
-            <p className="mt-4 max-w-xl text-white/70">{dict.home.ctaText}</p>
+            <RevealWords text={dict.home.ctaTitle} className="display-2 max-w-2xl !text-white" />
+            <Reveal kind="fade" delay={200}>
+              <p className="mt-5 max-w-xl text-white/65">{dict.home.ctaText}</p>
+            </Reveal>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <Reveal kind="up" delay={250} className="flex flex-wrap gap-3">
             <Link href={L("/configurator/")} className={buttonClass("bronze", "lg")}>
-              {dict.nav.configurator}
+              {dict.home.ctaCreate}
             </Link>
             <Link href={L("/calculator/")} className={buttonClass("light", "lg")}>
-              {dict.calculator.quick}
+              {dict.home.ctaCalc}
             </Link>
-          </div>
+          </Reveal>
         </div>
       </section>
     </main>

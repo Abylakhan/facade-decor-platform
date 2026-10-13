@@ -4,6 +4,7 @@ import type { Product } from "@/domain/types";
 import { lt } from "@/i18n";
 import { useI18n } from "@/lib/i18n-context";
 import { ProductDrawing } from "@/components/drawings/ProductDrawing";
+import { productImage } from "@/lib/renders";
 import { Badge } from "@/components/ui/feedback";
 import { Price } from "./Price";
 import { FavCompareButtons } from "./ProductActions";
@@ -12,9 +13,15 @@ export function ProductCard({ product, onQuickView }: { product: Product; onQuic
   const { locale, dict } = useI18n();
   const href = `/${locale}/product/${product.slug}/`;
   return (
-    <article className="group relative flex flex-col border border-line bg-white transition-shadow duration-[var(--duration-base)] hover:shadow-[var(--shadow-soft)]">
-      <div className="paper-grid relative flex aspect-[4/3] items-center justify-center overflow-hidden bg-paper p-6">
-        <ProductDrawing product={product} className="h-full w-full transition-transform duration-[var(--duration-slow)] ease-[var(--ease-arch)] group-hover:scale-[1.04]" />
+    <article className="group relative flex flex-col bg-white transition-[box-shadow,transform] duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]">
+      <div className="relative aspect-[4/3] overflow-hidden bg-[#d6cfc3]">
+        {/* studio render (3D visualisation from the product data) */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={productImage(product)} alt={lt(product.name, locale)} loading="lazy" className="zoom-img absolute inset-0 h-full w-full object-cover" />
+        {/* technical drawing fades in on hover */}
+        <div className="paper-grid absolute inset-0 flex items-center justify-center bg-paper/95 p-6 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+          <ProductDrawing product={product} className="h-full w-full" />
+        </div>
         <div className="absolute top-3 left-3 flex gap-1.5">
           {product.source === "demo" && <Badge tone="demo">DEMO</Badge>}
           <Badge tone={product.availability === "in-stock" ? "ok" : "neutral"}>{dict.availability[product.availability]}</Badge>

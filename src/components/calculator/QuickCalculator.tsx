@@ -11,6 +11,7 @@ import { lt } from "@/i18n";
 import { useI18n } from "@/lib/i18n-context";
 import { useCatalog } from "@/lib/catalog-context";
 import { saveProject } from "@/lib/project-actions";
+import { useSessionState } from "@/lib/session-state";
 import { Button, buttonClass } from "@/components/ui/Button";
 import { Alert } from "@/components/ui/feedback";
 import { Checkbox, Field, Input, NumberInput, Segmented, Select } from "@/components/ui/form";
@@ -45,14 +46,14 @@ export function QuickCalculator() {
   const router = useRouter();
   const toast = useToast();
   const k = dict.calculator;
-  const [step, setStep] = useState(0);
-  const [name, setName] = useState(dict.projects.defaultName);
-  const [type, setType] = useState<BuildingType>("private-house");
-  const [geo, setGeo] = useState<Geo>(EMPTY);
-  const [usedTypical, setUsedTypical] = useState(false);
+  const [step, setStep] = useSessionState("fd.qc.step", 0);
+  const [name, setName] = useSessionState("fd.qc.name", dict.projects.defaultName);
+  const [type, setType] = useSessionState<BuildingType>("fd.qc.type", "private-house");
+  const [geo, setGeo] = useSessionState<Geo>("fd.qc.geo", EMPTY);
+  const [usedTypical, setUsedTypical] = useSessionState("fd.qc.typical", false);
   const [showErrors, setShowErrors] = useState(false);
-  const [decor, setDecor] = useState<Partial<Record<PlacementKind, string>>>({});
-  const [opts, setOpts] = useState<CommercialOptions>({ package: "materials", deliveryZone: "city" });
+  const [decor, setDecor] = useSessionState<Partial<Record<PlacementKind, string>>>("fd.qc.decor", {});
+  const [opts, setOpts] = useSessionState<CommercialOptions>("fd.qc.opts", { package: "materials", deliveryZone: "city" });
   const [saved, setSaved] = useState<Project | null>(null);
 
   const missing = (Object.keys(EMPTY) as (keyof Geo)[]).filter((key) => {
@@ -110,6 +111,10 @@ export function QuickCalculator() {
 
   return (
     <div className="grid gap-10 lg:grid-cols-[220px_1fr]">
+      <div className="relative">
+      <div className="absolute top-0 bottom-0 left-0 hidden w-0.5 bg-line lg:block" aria-hidden="true">
+        <div className="w-full bg-bronze transition-[height] duration-700 ease-[var(--ease-out-expo)]" style={{ height: `${((step + 1) / k.steps.length) * 100}%` }} />
+      </div>
       <ol className="flex gap-2 overflow-x-auto lg:flex-col lg:gap-0" aria-label={k.quick}>
         {k.steps.map((label, i) => (
           <li key={label}>
@@ -117,8 +122,8 @@ export function QuickCalculator() {
               type="button"
               onClick={() => (i <= 1 || !missing.length ? setStep(i) : setShowErrors(true))}
               aria-current={step === i ? "step" : undefined}
-              className={`flex w-full items-center gap-3 border-l-2 px-3 py-2.5 text-left text-sm whitespace-nowrap transition-colors ${
-                step === i ? "border-bronze text-ink" : i < step ? "border-ink text-ink-3" : "border-line text-ink-4"
+              className={`flex w-full items-center gap-3 border-b-2 px-3 py-2.5 text-left text-sm whitespace-nowrap transition-colors duration-300 lg:border-b-0 lg:pl-5 ${
+                step === i ? "border-bronze text-ink" : i < step ? "border-ink/40 text-ink-3" : "border-transparent text-ink-4"
               }`}
             >
               <span className="num font-display text-xl">{i + 1}</span>
@@ -127,8 +132,9 @@ export function QuickCalculator() {
           </li>
         ))}
       </ol>
+      </div>
 
-      <div className="min-w-0">
+      <div key={step} className="step-in min-w-0">
         {step === 0 && (
           <div className="space-y-6">
             <Field label={dict.configurator.projectName}>

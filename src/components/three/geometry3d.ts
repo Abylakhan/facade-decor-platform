@@ -123,6 +123,50 @@ export function roofGeometry(g: HouseGeometry): THREE.BufferGeometry {
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute("position", new THREE.Float32BufferAttribute(v, 3));
+  geo.setAttribute("uv", new THREE.Float32BufferAttribute(roofUVs(v), 2));
   geo.computeVertexNormals();
   return geo;
+}
+
+/**
+ * Per-triangle UVs in metres for roof tiles: u runs along the eave, v up the slope,
+ * so courses of tiles stay horizontal on every roof plane.
+ */
+function roofUVs(v: number[]): number[] {
+  const uv: number[] = [];
+  const a = new THREE.Vector3();
+  const b = new THREE.Vector3();
+  const c = new THREE.Vector3();
+  const n = new THREE.Vector3();
+  const up = new THREE.Vector3(0, 1, 0);
+  const along = new THREE.Vector3();
+  const slope = new THREE.Vector3();
+  for (let i = 0; i < v.length; i += 9) {
+    a.set(v[i]!, v[i + 1]!, v[i + 2]!);
+    b.set(v[i + 3]!, v[i + 4]!, v[i + 5]!);
+    c.set(v[i + 6]!, v[i + 7]!, v[i + 8]!);
+    n.subVectors(b, a).cross(c.clone().sub(a)).normalize();
+    along.crossVectors(up, n);
+    if (along.lengthSq() < 1e-6) along.set(1, 0, 0);
+    along.normalize();
+    slope.crossVectors(n, along).normalize();
+    for (const p of [a, b, c]) uv.push(p.dot(along), p.dot(slope));
+  }
+  return uv;
+}
+
+/** Box with UVs in metres on every face (so tiled PBR textures keep real scale). */
+export function metricBox(w: number, h: number, d: number): THREE.BoxGeometry {
+  const g = new THREE.BoxGeometry(w, h, d);
+  const uv = g.getAttribute("uv");
+  // face order: +x, -x, +y, -y, +z, -z (4 vertices each)
+  const spans: [number, number][] = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
+  for (let f = 0; f < 6; f++) {
+    const [su, sv] = spans[f]!;
+    for (let i = 0; i < 4; i++) {
+      const k = f * 4 + i;
+      uv.setXY(k, uv.getX(k) * su, uv.getY(k) * sv);
+    }
+  }
+  return g;
 }

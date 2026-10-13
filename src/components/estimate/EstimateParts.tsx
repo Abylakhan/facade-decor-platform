@@ -72,7 +72,9 @@ export function Totals({ estimate, large = false }: { estimate: Estimate; large?
       {t.discount !== 0 && row(dict.calc.discount, t.discount, true)}
       <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-ink pt-3">
         <span className="text-sm font-medium">{t.hasUnpriced ? dict.calc.totalPartial : dict.calc.total}</span>
-        <span className={`num font-display ${large ? "text-4xl" : "text-3xl"}`}>{fmtMoney(t.total, locale)}</span>
+        <span key={t.total} className={`flash num px-1 font-display ${large ? "text-4xl" : "text-3xl"}`} aria-live="polite">
+          {fmtMoney(t.total, locale)}
+        </span>
       </div>
       <p className="mt-2 text-[11px] text-ink-4">
         {dict.calc.priceVersion}: {estimate.priceListVersion} · {dict.calc.calculatedAt}: {fmtDate(estimate.calculatedAt, locale)}
