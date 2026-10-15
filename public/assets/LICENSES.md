@@ -32,5 +32,9 @@ Built from two Pixabay videos by the same author, sharing scene, camera and hous
 
 License: **Pixabay Content License** (free for commercial use, no attribution required;
 the clips are not redistributed as standalone stock — they are cut, cross-faded, cropped and
-re-encoded into a 124-frame WebP sequence: `hero/d` 1440×810, `hero/m` 800×450).
+re-encoded into a 165-frame WebP sequence: `hero/d` 1440×810, `hero/m` 800×450).
+Processing: the blueprint stage is the wireframe minus a clean background plate (temporal
+maximum of the clip), smoothed and recoloured; the built stage is colour-graded, denoised and
+sharpened. `hero/*/plate.webp` (empty scene) and a cut-out of the final frame drive the
+scroll "orbit" (2.5D perspective turn) at the end of the hero.
 A credit line is shown on the hero anyway.

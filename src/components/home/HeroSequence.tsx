@@ -17,7 +17,15 @@ import { asset } from "@/lib/site";
 import { buttonClass } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/icons";
 
-const FRAMES = 124;
+const FRAMES = 165;
+/** Share of the scroll used by the drawing → house sequence; the rest is the "orbit". */
+const SEQ_END = 0.64;
+/** House silhouette (incl. its shadow) in the 1440×810 frame, for the orbit cut-out. */
+const HOUSE: [number, number][] = [
+  [327, 283], [605, 205], [758, 156], [865, 168], [1094, 304], [1072, 322], [1072, 648],
+  [852, 694], [520, 726], [200, 722], [188, 688], [352, 640], [362, 304],
+];
+const BOX = { x0: 180, x1: 1104, y0: 148, y1: 732, ground: 690, cx: 700 };
 const clamp = (x: number) => Math.min(1, Math.max(0, x));
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const seg = (p: number, a: number, b: number) => clamp((p - a) / (b - a));
@@ -30,6 +38,8 @@ export function HeroSequence() {
   const progress = useRef(0);
   const introStart = useRef<number | null>(null);
   const pointer = useRef({ x: 0, y: 0, tx: 0, ty: 0 });
+  const plate = useRef<HTMLImageElement | null>(null);
+  const houseCut = useRef<HTMLCanvasElement | null>(null);
   const [p, setP] = useState(0);
   const [loaded, setLoaded] = useState(0);
   const [mode, setMode] = useState<"pending" | "scrub" | "static">("pending");
@@ -57,6 +67,7 @@ export function HeroSequence() {
         if (cancelled) return;
         frames.current[idx] = img;
         count++;
+        if (idx === FRAMES - 1) houseCut.current = cutHouse(img);
         if (count % 8 === 0 || count === FRAMES) setLoaded(count);
         if (idx === 0) {
           // plot the drawing on load (time-based), independent of scrolling
@@ -72,6 +83,12 @@ export function HeroSequence() {
       img.onerror = () => loadOne();
     };
     for (let k = 0; k < 6; k++) loadOne(); // a few parallel requests
+    const pl = new Image();
+    pl.decoding = "async";
+    pl.src = asset(`/hero/${set}/plate.webp`);
+    pl.onload = () => {
+      if (!cancelled) plate.current = pl;
+    };
     return () => {
       cancelled = true;
       frames.current = [];
@@ -95,7 +112,7 @@ export function HeroSequence() {
     const ctx = c.getContext("2d");
     if (!ctx) return;
     const pr = progress.current;
-    const t = easeInOut(seg(pr, 0.08, 0.82));
+    const t = easeInOut(seg(pr, 0.06, SEQ_END));
     const idx = Math.round(t * (FRAMES - 1));
     const img = frameAt(idx);
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -106,12 +123,13 @@ export function HeroSequence() {
       c.height = Math.round(h * dpr);
     }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.imageSmoothingQuality = "high";
     ctx.fillStyle = "#0a1018";
     ctx.fillRect(0, 0, w, h);
     if (!img) return;
-    // camera: slow push-in towards the house at the end + subtle pointer parallax
-    const zoom = 1.0 + 0.12 * easeInOut(seg(pr, 0.72, 1));
+    const orbit = easeInOut(seg(pr, SEQ_END, 1)); // 0..1 pseudo-3D turn of the finished house
     const ptr = pointer.current;
+    const zoom = 1.0 + 0.1 * orbit;
     const cover = Math.max(w / img.naturalWidth, h / img.naturalHeight);
     const portrait = h > w * 1.1;
     // portrait phones: show the whole house (fit by width, slightly enlarged) over a dimmed cover copy
@@ -119,7 +137,8 @@ export function HeroSequence() {
     if (portrait) {
       const cw = img.naturalWidth * cover;
       const ch = img.naturalHeight * cover;
-      ctx.drawImage(img, (w - cw) / 2, (h - ch) / 2, cw, ch);
+      const backdrop = orbit > 0.001 && plate.current && houseCut.current ? plate.current : img;
+      ctx.drawImage(backdrop, (w - cw) / 2, (h - ch) / 2, cw, ch);
       ctx.fillStyle = "rgba(8,8,7,0.62)";
       ctx.fillRect(0, 0, w, h);
     }
@@ -128,7 +147,37 @@ export function HeroSequence() {
     // on wide screens the house starts right of the title, then settles in the centre
     const shift = w > 1024 ? w * 0.21 * (1 - easeInOut(seg(pr, 0.04, 0.3))) : 0;
     const x = (w - dw) / 2 + shift + ptr.x * 14;
-    const y = (h - dh) / 2 + 0.035 * dh * easeInOut(seg(pr, 0.72, 1)) + ptr.y * 10;
+    const y = (h - dh) / 2 + 0.03 * dh * orbit + ptr.y * 10;
+
+    // orbit: background plate slides one way, the house turns in perspective and slides the other
+    const cut = houseCut.current;
+    if (orbit > 0.001 && cut && plate.current) {
+      const k = img.naturalWidth / 1440;
+      const theta = (orbit * 17 + ptr.x * 4) * (Math.PI / 180);
+      ctx.drawImage(plate.current, x - orbit * dw * 0.06 - dw * 0.02, y - dh * 0.01, dw * 1.04, dh * 1.02);
+      const N = 72;
+      const x0 = BOX.x0 * k;
+      const x1 = BOX.x1 * k;
+      const y0 = BOX.y0 * k;
+      const y1 = BOX.y1 * k;
+      const g = BOX.ground * k;
+      const cx = BOX.cx * k;
+      const half = (x1 - x0) / 2;
+      const sw = (x1 - x0) / N;
+      const cos = Math.cos(theta);
+      const sin = Math.sin(theta);
+      const slide = orbit * 0.035 * img.naturalWidth;
+      for (let i = 0; i < N; i++) {
+        const sx = x0 + i * sw;
+        const u = (sx + sw / 2 - cx) / half;
+        const persp = 1 + u * sin * 0.5; // near side grows, far side recedes
+        const dxs = cx + (sx - cx) * cos + slide;
+        const top = g - (g - y0) * persp;
+        ctx.drawImage(cut, sx, y0, sw, y1 - y0, x + dxs * scale, y + top * scale, (sw * cos + 0.8) * scale, (y1 - y0) * persp * scale);
+      }
+      return;
+    }
+
     // blueprint stage: the drawing is "plotted" with a sweeping reveal
     const timeReveal = introStart.current === null ? 0 : clamp((performance.now() - introStart.current) / 1800);
     const reveal = Math.max(timeReveal, seg(pr, 0, 0.05));
@@ -197,9 +246,9 @@ export function HeroSequence() {
 
   const phases = dict.home.phases;
   const scrub = mode !== "static";
-  const phaseIdx = Math.min(phases.length - 1, Math.floor(seg(p, 0.02, 0.85) * phases.length * 0.999));
+  const phaseIdx = Math.min(phases.length - 1, Math.floor(seg(p, 0.02, SEQ_END + 0.08) * phases.length * 0.999));
   const introOut = scrub ? seg(p, 0.03, 0.12) : 1; // opening title leaves
-  const finalIn = scrub ? seg(p, 0.84, 0.95) : 1; // final title arrives over the finished house
+  const finalIn = scrub ? seg(p, 0.86, 0.96) : 1; // final title arrives over the finished house
   const titleWords = dict.home.heroTitle.split(" ");
 
   const actions = (delay: number, visible: boolean) => (
@@ -223,7 +272,7 @@ export function HeroSequence() {
   );
 
   return (
-    <section ref={section} data-hero aria-label={dict.home.heroTitle} className={`relative bg-blueprint ${scrub ? "h-[460vh]" : "h-screen"}`}>
+    <section ref={section} data-hero aria-label={dict.home.heroTitle} className={`relative bg-blueprint ${scrub ? "h-[560vh]" : "h-screen"}`}>
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         {/* poster under the canvas: instant first paint, no-JS and reduced-motion fallback */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -317,4 +366,23 @@ export function HeroSequence() {
       </div>
     </section>
   );
+}
+
+/** Final frame clipped to the house silhouette with a soft edge (offscreen, built once). */
+function cutHouse(img: HTMLImageElement): HTMLCanvasElement {
+  const k = img.naturalWidth / 1440;
+  const c = document.createElement("canvas");
+  c.width = img.naturalWidth;
+  c.height = img.naturalHeight;
+  const ctx = c.getContext("2d")!;
+  ctx.filter = `blur(${(2 * k).toFixed(1)}px)`; // feathered mask (ignored where unsupported)
+  ctx.fillStyle = "#fff";
+  ctx.beginPath();
+  HOUSE.forEach(([px, py], i) => (i ? ctx.lineTo(px * k, py * k) : ctx.moveTo(px * k, py * k)));
+  ctx.closePath();
+  ctx.fill();
+  ctx.filter = "none";
+  ctx.globalCompositeOperation = "source-in";
+  ctx.drawImage(img, 0, 0);
+  return c;
 }
