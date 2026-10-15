@@ -2,30 +2,30 @@
 
 /* ------------------------------------------------------------------ tokens */
 @theme {
-  /* dark architectural palette: graphite surfaces, warm ivory type, bronze accent */
-  --color-ink: #efe9de;
-  --color-ink-2: #dcd4c6;
-  --color-ink-3: #a39c90;
-  --color-ink-4: #777168;
-  --color-line: #2a2824;
-  --color-line-strong: #3d3a35;
-  --color-stone: #1e1d1a;
+  /* daylight architectural palette: warm white, stone and beige, restrained graphite and bronze */
+  --color-ink: #1b1a18;
+  --color-ink-2: #2b2a27;
+  --color-ink-3: #5b5750;
+  --color-ink-4: #8a857b;
+  --color-line: #dcd5c8;
+  --color-line-strong: #c4bbaa;
+  --color-stone: #ebe6dc;
   --color-sand: #d8c9ad;
-  --color-paper: #0e0e0d;
+  --color-paper: #f6f3ed;
   --color-white: #ffffff;
-  --color-surface: #171614;
-  --color-deep: #080807;
-  --color-bronze: #b9875a;
-  --color-bronze-2: #d4a26f;
-  --color-bronze-soft: #2c2219;
-  --color-blueprint: #0a1018;
-  --color-blueprint-line: #6f9fc9;
-  --color-danger: #e3836f;
-  --color-danger-soft: #331b16;
-  --color-warn: #d9a956;
-  --color-warn-soft: #2e2416;
-  --color-ok: #86b893;
-  --color-ok-soft: #18261c;
+  --color-surface: #fffdf9;
+  --color-deep: #1f1e1b;
+  --color-bronze: #93653a;
+  --color-bronze-2: #b48450;
+  --color-bronze-soft: #efe2cf;
+  --color-blueprint: #f4f2ec;
+  --color-blueprint-line: #2c4260;
+  --color-danger: #9e3b2b;
+  --color-danger-soft: #f6e3de;
+  --color-warn: #8d6420;
+  --color-warn-soft: #f5ead2;
+  --color-ok: #3d6a4a;
+  --color-ok-soft: #e1ede3;
 
   --font-display: var(--font-cormorant), "Times New Roman", serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
@@ -49,7 +49,7 @@
     text-rendering: optimizeLegibility;
   }
   html {
-    color-scheme: dark;
+    color-scheme: light;
   }
   body {
     @apply bg-paper text-ink font-sans antialiased;
@@ -127,14 +127,14 @@
   }
   .blueprint-grid {
     background-image:
-      linear-gradient(rgb(95 141 181 / 0.12) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(95 141 181 / 0.12) 1px, transparent 1px);
+      linear-gradient(rgb(44 66 96 / 0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(44 66 96 / 0.07) 1px, transparent 1px);
     background-size: 32px 32px;
   }
   .paper-grid {
     background-image:
-      linear-gradient(rgb(239 233 222 / 0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(239 233 222 / 0.035) 1px, transparent 1px);
+      linear-gradient(rgb(27 26 24 / 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(27 26 24 / 0.045) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 }

@@ -20,20 +20,20 @@ export function HorizontalShowcase() {
   const items = ["p-k300", "p-w180k", "p-bl", "p-c300", "p-b1", "p-rs1", "p-ks1", "p-p300"].map(product).filter((x): x is Product => !!x);
   const n = items.length;
   return (
-    <section ref={ref} className="relative bg-deep text-white lg:h-[340vh]">
+    <section ref={ref} className="relative border-y border-line bg-stone text-ink lg:h-[340vh]">
       <div className="flex flex-col py-20 lg:sticky lg:top-0 lg:h-screen lg:flex-row lg:items-center lg:overflow-hidden lg:py-0">
         <div className="container-x relative z-10 shrink-0 lg:w-[34vw] lg:max-w-none">
-          <p className="eyebrow !text-sand">02 · {dict.nav.catalog}</p>
+          <p className="eyebrow">02 · {dict.nav.catalog}</p>
           <h2 className="mt-5 font-display text-[40px] leading-[1.02] font-light sm:text-[56px]">{dict.home.detailsTitle}</h2>
-          <p className="mt-5 max-w-sm text-white/60">{dict.home.detailsText}</p>
+          <p className="mt-5 max-w-sm text-ink-3">{dict.home.detailsText}</p>
           <div className="mt-8 hidden items-center gap-4 lg:flex">
-            <span className="num font-display text-3xl text-bronze-2">{String(Math.min(n, 1 + Math.floor(p * n * 0.999))).padStart(2, "0")}</span>
-            <span className="relative h-px w-40 bg-white/15">
-              <span className="absolute inset-y-0 left-0 bg-bronze-2" style={{ width: `${p * 100}%` }} />
+            <span className="num font-display text-3xl text-bronze">{String(Math.min(n, 1 + Math.floor(p * n * 0.999))).padStart(2, "0")}</span>
+            <span className="relative h-px w-40 bg-ink/15">
+              <span className="absolute inset-y-0 left-0 bg-bronze" style={{ width: `${p * 100}%` }} />
             </span>
-            <span className="num text-sm text-white/40">{String(n).padStart(2, "0")}</span>
+            <span className="num text-sm text-ink-4">{String(n).padStart(2, "0")}</span>
           </div>
-          <Link href={`/${locale}/catalog/`} className="u-line mt-8 inline-flex items-center gap-2 text-sm text-white/80 hover:text-white">
+          <Link href={`/${locale}/catalog/`} className="u-line mt-8 inline-flex items-center gap-2 text-sm text-ink-2 hover:text-ink">
             {dict.nav.catalog} <Icon name="arrow" size={15} />
           </Link>
         </div>
@@ -62,12 +62,12 @@ export function HorizontalShowcase() {
                         <Icon name="arrow" size={16} />
                       </span>
                     </div>
-                    <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-white/10 pt-4">
+                    <div className="mt-4 flex items-baseline justify-between gap-4 border-t border-ink/10 pt-4">
                       <div>
-                        <p className="text-[11px] tracking-[0.18em] text-sand uppercase">{it.sku}</p>
+                        <p className="text-[11px] tracking-[0.18em] text-bronze uppercase">{it.sku}</p>
                         <p className="mt-1 font-display text-2xl leading-tight">{lt(it.name, locale)}</p>
                       </div>
-                      <Price product={it} className="shrink-0 text-sm text-white/60" />
+                      <Price product={it} className="shrink-0 text-sm text-ink-3" />
                     </div>
                   </Link>
                 </li>
@@ -133,7 +133,7 @@ export function CtaScroll({ title, text, children }: { title: string; text: stri
       <div className="blueprint-grid pointer-events-none absolute -inset-20 opacity-50" style={{ transform: `translate3d(0, ${(0.5 - p) * 80}px, 0)` }} aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_120%,rgba(185,135,90,0.22),transparent_60%)]" aria-hidden="true" />
       <div className="container-x relative">
-        <h2 className="max-w-4xl font-display text-[42px] leading-[1.02] font-light sm:text-[64px] lg:text-[80px]" style={{ opacity: 0.2 + 0.8 * k, transform: `translate3d(0, ${(1 - k) * 40}px, 0) scale(${0.96 + 0.04 * k})`, transformOrigin: "left bottom" }}>
+        <h2 className="max-w-4xl font-display text-[42px] text-white leading-[1.02] font-light sm:text-[64px] lg:text-[80px]" style={{ opacity: 0.2 + 0.8 * k, transform: `translate3d(0, ${(1 - k) * 40}px, 0) scale(${0.96 + 0.04 * k})`, transformOrigin: "left bottom" }}>
           {title}
         </h2>
         <p className="mt-6 max-w-xl text-white/65" style={{ opacity: k }}>

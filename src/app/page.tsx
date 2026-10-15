@@ -7,7 +7,7 @@ export default function Root() {
     <>
       <meta httpEquiv="refresh" content={`2; url=${asset("/ru/")}`} />
       <RootRedirect />
-      <main className="flex min-h-screen items-center justify-center bg-blueprint text-white/70">
+      <main className="flex min-h-screen items-center justify-center bg-paper text-ink-3">
         <a href={asset("/ru/")} className="font-display text-2xl">
           Atelier Façade →
         </a>

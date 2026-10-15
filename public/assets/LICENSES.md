@@ -23,18 +23,13 @@ and open `/render-lab/` (dev only).
 
 ## Home-page scroll sequence (`public/hero/`)
 
-Built from two Pixabay videos by the same author, sharing scene, camera and house:
+| Source | Creator | License |
+|---|---|---|
+| https://www.pexels.com/video/modern-luxury-home-exterior-with-landscape-37544730/ | Reyd Valencia (Pexels) | **Pexels License** — free for commercial use, attribution not required, modification allowed; the footage is not resold or redistributed as standalone stock |
 
-| Source | Use |
-|---|---|
-| https://pixabay.com/videos/home-architecture-design-31290/ | wireframe house growing; the blueprint stage is *extracted from these frames* (line mask, recoloured on dark) |
-| https://pixabay.com/videos/home-3d-architecture-design-31289/ | the same house built out with materials and a tiled roof |
-
-License: **Pixabay Content License** (free for commercial use, no attribution required;
-the clips are not redistributed as standalone stock — they are cut, cross-faded, cropped and
-re-encoded into a 165-frame WebP sequence: `hero/d` 1440×810, `hero/m` 800×450).
-Processing: the blueprint stage is the wireframe minus a clean background plate (temporal
-maximum of the clip), smoothed and recoloured; the built stage is colour-graded, denoised and
-sharpened. `hero/*/plate.webp` (empty scene) and a cut-out of the final frame drive the
-scroll "orbit" (2.5D perspective turn) at the end of the hero.
+Use: the 1920×1080 / 30 fps clip (10 s) is re-encoded **without colour grading** into a
+101-frame WebP sequence (`hero/d` 1920×1080, `hero/m` 860×860 square crop) that the scroll
+scrubs. `hero/*/sketch.webp` is a pen-line drawing traced from the first frame of the same clip
+(edge extraction on an upscaled, edge-preserving smoothed frame, foliage and ground texture
+suppressed), so the drawing and the render coincide line for line. No other footage is used.
 A credit line is shown on the hero anyway.
