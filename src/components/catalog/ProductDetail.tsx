@@ -42,7 +42,7 @@ export function ProductDetail({ product }: { product: Product }) {
               ...(gl ? [{ id: "3d" as const, label: dict.product.preview3d }] : []),
             ]}
           />
-          <div key={tab} className="page-in relative mt-4 aspect-[4/3] overflow-hidden border border-line bg-white">
+          <div key={tab} className="page-in relative mt-4 aspect-[4/3] overflow-hidden border border-line bg-surface">
             {tab === "render" ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={productImage(product)} alt={lt(product.name, locale)} className="h-full w-full object-cover" />

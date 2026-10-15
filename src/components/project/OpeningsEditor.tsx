@@ -52,7 +52,7 @@ export function OpeningsEditor({ g, onChange }: { g: HouseGeometry; onChange: (g
       </p>
       <ul className="space-y-3">
         {wall?.openings.map((o, i) => (
-          <li key={o.id} className="border border-line bg-white p-3">
+          <li key={o.id} className="border border-line bg-surface p-3">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-sm font-medium">
                 {dict.openingKind[o.kind]} {i + 1}
@@ -63,7 +63,7 @@ export function OpeningsEditor({ g, onChange }: { g: HouseGeometry; onChange: (g
                   <select
                     value={o.floor}
                     onChange={(e) => patch(o.id, { floor: Number(e.target.value) })}
-                    className="h-7 border border-line-strong bg-white px-1 text-xs"
+                    className="h-7 border border-line-strong bg-surface px-1 text-xs"
                   >
                     {Array.from({ length: Math.max(1, g.floors) }, (_, f) => (
                       <option key={f} value={f}>

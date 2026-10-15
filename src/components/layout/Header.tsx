@@ -70,7 +70,7 @@ export function Header() {
           dark ? "bg-transparent text-white" : "border-b border-line bg-paper/92 text-ink backdrop-blur-md"
         } ${fullscreen ? "!relative" : ""}`}
       >
-        <div className={`flex items-center justify-center gap-2 py-1 text-[10px] tracking-[0.18em] uppercase ${dark ? "bg-black/30 text-white/70" : "bg-ink text-white/80"}`}>
+        <div className={`flex items-center justify-center gap-2 py-1 text-[10px] tracking-[0.18em] uppercase ${dark ? "bg-black/30 text-white/70" : "bg-deep text-white/70"}`}>
           <span className="font-semibold text-sand">DEMO</span>
           <span className="hidden sm:inline">· {dict.common.demoShort}</span>
         </div>
@@ -119,7 +119,7 @@ export function Header() {
                     hrefLang={l}
                     onClick={(e) => goLocale(e, l)}
                     aria-current={l === locale ? "true" : undefined}
-                    className={`relative z-10 w-9 py-1 text-center font-medium tracking-widest uppercase transition-colors duration-300 ${l === locale ? "text-white" : "text-ink-3 hover:text-ink"}`}
+                    className={`relative z-10 w-9 py-1 text-center font-medium tracking-widest uppercase transition-colors duration-300 ${l === locale ? "text-paper" : "text-ink-3 hover:text-ink"}`}
                   >
                     {l === "kk" ? "kz" : l}
                   </a>
@@ -135,7 +135,7 @@ export function Header() {
 
       {open && (
         <div className="no-print fixed inset-0 z-[90] flex xl:hidden" role="dialog" aria-modal="true" aria-label={dict.nav.menu}>
-          <div className="absolute inset-0 bg-ink/50" onClick={() => setOpen(false)} />
+          <div className="absolute inset-0 bg-black/65" onClick={() => setOpen(false)} />
           <nav className="relative ml-auto flex h-full w-[88%] max-w-sm flex-col overflow-auto bg-paper p-6 animate-[toastIn_var(--duration-base)_var(--ease-arch)]">
             <div className="mb-8 flex items-center justify-between">
               <Logo />
@@ -161,7 +161,7 @@ export function Header() {
             </ul>
             <div className="mt-auto flex gap-2 pt-8">
               {LOCALES.map((l) => (
-                <Link key={l} href={switchTo(l)} onClick={(e) => goLocale(e, l)} className={`border px-3 py-1.5 text-xs uppercase tracking-widest ${l === locale ? "border-ink bg-ink text-white" : "border-line-strong"}`}>
+                <Link key={l} href={switchTo(l)} onClick={(e) => goLocale(e, l)} className={`border px-3 py-1.5 text-xs uppercase tracking-widest ${l === locale ? "border-ink bg-ink text-paper" : "border-line-strong"}`}>
                   {l === "ru" ? "Русский" : "Қазақша"}
                 </Link>
               ))}
@@ -193,7 +193,7 @@ function SearchDialog({ open, onClose }: { open: boolean; onClose: () => void })
         <label htmlFor="global-search" className="sr-only">
           {dict.nav.search}
         </label>
-        <div className="flex border border-ink bg-white">
+        <div className="flex border border-ink bg-surface">
           <input id="global-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={dict.nav.searchPlaceholder} className="h-12 flex-1 px-4 text-base outline-none" autoComplete="off" />
           <button type="submit" className="px-4" aria-label={dict.nav.search}>
             <Icon name="arrow" />

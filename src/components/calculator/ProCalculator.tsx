@@ -251,7 +251,7 @@ export function ProCalculator() {
         )}
         <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr]">
           <Messages estimate={estimate} />
-          <div className="space-y-4 border border-line bg-white p-5">
+          <div className="space-y-4 border border-line bg-surface p-5">
             <Totals estimate={estimate} large />
             <LeadModalButton label={dict.common.sendToManager} project={project} estimate={estimate} variant="bronze" />
           </div>

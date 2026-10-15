@@ -34,7 +34,7 @@ export function Footer() {
     ],
   ];
   return (
-    <footer className={`no-print bg-ink text-white/70 ${home ? "border-t border-white/10" : "mt-24"}`}>
+    <footer className={`no-print bg-deep text-white/70 ${home ? "border-t border-white/10" : "mt-24"}`}>
       <div className="container-x grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div className="space-y-4">
           <Logo light />

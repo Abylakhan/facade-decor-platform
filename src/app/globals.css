@@ -2,27 +2,30 @@
 
 /* ------------------------------------------------------------------ tokens */
 @theme {
-  --color-ink: #1b1a18;
-  --color-ink-2: #2b2a27;
-  --color-ink-3: #5b5750;
-  --color-ink-4: #8a857b;
-  --color-line: #dcd5c8;
-  --color-line-strong: #c4bbaa;
-  --color-stone: #ebe6dc;
+  /* dark architectural palette: graphite surfaces, warm ivory type, bronze accent */
+  --color-ink: #efe9de;
+  --color-ink-2: #dcd4c6;
+  --color-ink-3: #a39c90;
+  --color-ink-4: #777168;
+  --color-line: #2a2824;
+  --color-line-strong: #3d3a35;
+  --color-stone: #1e1d1a;
   --color-sand: #d8c9ad;
-  --color-paper: #f6f3ed;
-  --color-white: #fffdf9;
-  --color-bronze: #93653a;
-  --color-bronze-2: #b48450;
-  --color-bronze-soft: #efe2cf;
-  --color-blueprint: #0e1822;
-  --color-blueprint-line: #5f8db5;
-  --color-danger: #9e3b2b;
-  --color-danger-soft: #f6e3de;
-  --color-warn: #8d6420;
-  --color-warn-soft: #f5ead2;
-  --color-ok: #3d6a4a;
-  --color-ok-soft: #e1ede3;
+  --color-paper: #0e0e0d;
+  --color-white: #ffffff;
+  --color-surface: #171614;
+  --color-deep: #080807;
+  --color-bronze: #b9875a;
+  --color-bronze-2: #d4a26f;
+  --color-bronze-soft: #2c2219;
+  --color-blueprint: #0a1018;
+  --color-blueprint-line: #6f9fc9;
+  --color-danger: #e3836f;
+  --color-danger-soft: #331b16;
+  --color-warn: #d9a956;
+  --color-warn-soft: #2e2416;
+  --color-ok: #86b893;
+  --color-ok-soft: #18261c;
 
   --font-display: var(--font-cormorant), "Times New Roman", serif;
   --font-sans: var(--font-inter), system-ui, sans-serif;
@@ -44,6 +47,9 @@
   html {
     -webkit-text-size-adjust: 100%;
     text-rendering: optimizeLegibility;
+  }
+  html {
+    color-scheme: dark;
   }
   body {
     @apply bg-paper text-ink font-sans antialiased;
@@ -102,7 +108,7 @@
     font-variant-numeric: tabular-nums;
   }
   .card {
-    @apply border border-line bg-white;
+    @apply border border-line bg-surface;
   }
   .table-base {
     @apply w-full border-collapse text-left text-sm;
@@ -127,8 +133,8 @@
   }
   .paper-grid {
     background-image:
-      linear-gradient(rgb(27 26 24 / 0.045) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(27 26 24 / 0.045) 1px, transparent 1px);
+      linear-gradient(rgb(239 233 222 / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(239 233 222 / 0.035) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 }
@@ -149,6 +155,19 @@
   @page {
     size: A4;
     margin: 14mm 12mm;
+  }
+  :root {
+    /* print stays light and economical */
+    --color-ink: #1b1a18;
+    --color-ink-2: #2b2a27;
+    --color-ink-3: #5b5750;
+    --color-ink-4: #8a857b;
+    --color-line: #dcd5c8;
+    --color-line-strong: #c4bbaa;
+    --color-stone: #ebe6dc;
+    --color-paper: #ffffff;
+    --color-surface: #ffffff;
+    --color-bronze-soft: #efe2cf;
   }
   body {
     background: #fff !important;
@@ -269,6 +288,10 @@
 
 /* drawing: strokes animate with --draw (1 → 0) */
 .draw * { stroke-dasharray: 1; stroke-dashoffset: var(--draw, 0); }
+.draw .st { stroke-dashoffset: var(--d-st, var(--draw, 0)); }
+.draw .op { stroke-dashoffset: var(--d-op, var(--draw, 0)); }
+.draw .decor { stroke-dashoffset: var(--d-dec, var(--draw, 0)); }
+.draw .no-draw { opacity: var(--hatch, 1); transition: opacity 400ms; }
 .draw .no-draw, .draw .no-draw *, .draw text { stroke-dasharray: none; stroke-dashoffset: 0; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -281,4 +304,28 @@ main > header + section,
 main > header + article,
 main > header + div {
   padding-top: 3.5rem;
+}
+
+/* hero entrance */
+@keyframes heroWord {
+  from { transform: translate3d(0, 110%, 0) rotate(2deg); }
+  to { transform: none; }
+}
+@keyframes heroIn {
+  from { opacity: 0; transform: translate3d(0, 18px, 0); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: none; }
+}
+.hero-word { animation: heroWord 1100ms var(--ease-out-expo) both; }
+.hero-in { animation: heroIn 1000ms var(--ease-out-expo) both; }
+@keyframes scrollCue {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+.scroll-cue { animation: scrollCue 1.8s var(--ease-in-out) infinite; }
+
+/* scroll-lit text: words brighten as the reader scrolls */
+.lit-word { transition: color 300ms linear; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-word, .hero-in, .scroll-cue { animation: none !important; }
 }

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import type { MouseEvent } from "react";
 import type { Product } from "@/domain/types";
 import { lt } from "@/i18n";
 import { useI18n } from "@/lib/i18n-context";
@@ -12,8 +13,23 @@ import { FavCompareButtons } from "./ProductActions";
 export function ProductCard({ product, onQuickView }: { product: Product; onQuickView?: (p: Product) => void }) {
   const { locale, dict } = useI18n();
   const href = `/${locale}/product/${product.slug}/`;
+  // subtle depth: the card tilts towards the cursor (mouse only)
+  const tilt = (e: MouseEvent<HTMLElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    e.currentTarget.style.setProperty("--rx", `${((e.clientY - r.top) / r.height - 0.5) * -4}deg`);
+    e.currentTarget.style.setProperty("--ry", `${((e.clientX - r.left) / r.width - 0.5) * 5}deg`);
+  };
+  const untilt = (e: MouseEvent<HTMLElement>) => {
+    e.currentTarget.style.setProperty("--rx", "0deg");
+    e.currentTarget.style.setProperty("--ry", "0deg");
+  };
   return (
-    <article className="group relative flex flex-col bg-white transition-[box-shadow,transform] duration-500 ease-[var(--ease-out-expo)] hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]">
+    <article
+      onMouseMove={tilt}
+      onMouseLeave={untilt}
+      style={{ transform: "perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))" }}
+      className="group relative flex flex-col border border-line bg-surface transition-[box-shadow,transform,border-color] duration-500 ease-[var(--ease-out-expo)] hover:border-line-strong hover:shadow-[0_30px_60px_-30px_rgba(0,0,0,0.8)]"
+    >
       <div className="relative aspect-[4/3] overflow-hidden bg-[#d6cfc3]">
         {/* studio render (3D visualisation from the product data) */}
         {/* eslint-disable-next-line @next/next/no-img-element */}

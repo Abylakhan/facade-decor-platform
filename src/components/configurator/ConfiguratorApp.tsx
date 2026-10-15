@@ -350,7 +350,7 @@ export function ConfiguratorApp() {
             <Alert tone="info">{c.webglFallback}</Alert>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               {SIDES.map((s) => (
-                <figure key={s} className="border border-line bg-white p-2">
+                <figure key={s} className="border border-line bg-surface p-2">
                   <figcaption className="dim mb-1">{dict.sides[s]}</figcaption>
                   <FacadeElevation variant={variant} product={product} side={s} className="w-full" />
                 </figure>
@@ -367,7 +367,7 @@ export function ConfiguratorApp() {
                 type="button"
                 onClick={() => goView(v)}
                 aria-pressed={view === v}
-                className={`h-8 px-2.5 text-xs backdrop-blur transition-colors ${view === v ? "bg-ink text-white" : "bg-white/80 text-ink hover:bg-white"}`}
+                className={`h-8 px-2.5 text-xs backdrop-blur transition-colors ${view === v ? "bg-ink text-paper" : "bg-surface/80 text-ink hover:bg-surface"}`}
               >
                 {c.views[v]}
               </button>
@@ -377,7 +377,7 @@ export function ConfiguratorApp() {
               onClick={() => setScene({ lighting: variant.scene.lighting === "day" ? "evening" : "day" })}
               aria-label={c.lighting}
               title={c.lighting}
-              className="inline-flex h-8 w-8 items-center justify-center bg-white/80 backdrop-blur hover:bg-white"
+              className="inline-flex h-8 w-8 items-center justify-center bg-surface/80 backdrop-blur hover:bg-surface"
             >
               <Icon name={variant.scene.lighting === "day" ? "moon" : "sun"} size={16} />
             </button>
@@ -488,7 +488,7 @@ function VariantRow({
 }) {
   const { locale, dict } = useI18n();
   return (
-    <li className={`border p-3 ${active ? "border-ink bg-white" : "border-line bg-white/60"}`}>
+    <li className={`border p-3 ${active ? "border-ink bg-surface" : "border-line bg-surface/60"}`}>
       <div className="flex items-center gap-2">
         <input type="radio" name="active-variant" checked={active} onChange={onSelect} aria-label={`${dict.configurator.active}: ${v.name}`} className="accent-[var(--color-bronze)]" />
         <Input value={v.name} onChange={(e) => onRename(e.target.value.slice(0, 120) || v.name)} aria-label={dict.common.rename} className="h-8 flex-1" />

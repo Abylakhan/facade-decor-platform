@@ -55,7 +55,7 @@ export function FacadeElevation({
   const Y = (y: number) => (Ht - pad * 0.8 - y) * S;
 
   const ink = tone === "ink";
-  const stroke = tone === "blueprint" ? "#8fb6d8" : ink ? "#2b2a27" : "#1b1a18";
+  const stroke = tone === "blueprint" ? "#8fb6d8" : ink ? "var(--color-ink)" : "#1b1a18";
   const thin = tone === "blueprint" ? "#5f8db5" : "#8a857b";
   const wallFill = tone === "blueprint" || ink ? "transparent" : variant.scene.facadeColor;
   const decorFill = tone === "blueprint" ? "rgba(143,182,216,0.15)" : ink ? "var(--decor-fill, transparent)" : variant.scene.decorColor;
@@ -89,7 +89,7 @@ export function FacadeElevation({
       for (const y of ys) {
         els.push(rect(-ext, y, len + 2 * ext, ph));
         // profile lines suggest the moulding
-        for (const f of [0.3, 0.6, 0.8]) els.push(<line key={k++} pathLength={1} x1={X(-ext)} x2={X(len + ext)} y1={Y(y + ph * f)} y2={Y(y + ph * f)} stroke={thin} strokeWidth={0.5} />);
+        for (const f of [0.3, 0.6, 0.8]) els.push(<line key={k++} className="decor" pathLength={1} x1={X(-ext)} x2={X(len + ext)} y1={Y(y + ph * f)} y2={Y(y + ph * f)} stroke={thin} strokeWidth={0.5} />);
       }
     }
     if ((pl.kind === "window-surround" || pl.kind === "door-surround") && onSide(s)) {
@@ -169,24 +169,24 @@ export function FacadeElevation({
         </defs>
       )}
       {/* ground */}
-      <line pathLength={1} x1={X(-pad * 0.8)} x2={X(len + pad * 0.8)} y1={Y(0)} y2={Y(0)} stroke={stroke} strokeWidth={1.2} />
+      <line className="st" pathLength={1} x1={X(-pad * 0.8)} x2={X(len + pad * 0.8)} y1={Y(0)} y2={Y(0)} stroke={stroke} strokeWidth={1.2} />
       {/* roof */}
-      <polygon pathLength={1} points={roofPts.map(([u, y]) => `${X(u!)},${Y(y!)}`).join(" ")} fill={tone === "blueprint" || ink ? "transparent" : variant.scene.roofColor} stroke={stroke} strokeWidth={1} />
+      <polygon className="st" pathLength={1} points={roofPts.map(([u, y]) => `${X(u!)},${Y(y!)}`).join(" ")} fill={tone === "blueprint" || ink ? "transparent" : variant.scene.roofColor} stroke={stroke} strokeWidth={1} />
       {ink && <RoofHatch pts={roofPts.map(([u, y]) => [X(u!), Y(y!)] as [number, number])} />}
       {/* wall + plinth */}
-      <rect pathLength={1} x={X(0)} y={Y(H)} width={len * S} height={(H - g.plinthHeight) * S} fill={wallFill} stroke={stroke} strokeWidth={1} />
-      <rect pathLength={1} x={X(-0.03)} y={Y(g.plinthHeight)} width={(len + 0.06) * S} height={g.plinthHeight * S} fill={tone === "blueprint" ? "transparent" : ink ? "url(#stone-hatch)" : "#8c857a"} stroke={stroke} strokeWidth={1} />
+      <rect className="st" pathLength={1} x={X(0)} y={Y(H)} width={len * S} height={(H - g.plinthHeight) * S} fill={wallFill} stroke={stroke} strokeWidth={1} />
+      <rect className="st" pathLength={1} x={X(-0.03)} y={Y(g.plinthHeight)} width={(len + 0.06) * S} height={g.plinthHeight * S} fill={tone === "blueprint" ? "transparent" : ink ? "url(#stone-hatch)" : "#8c857a"} stroke={stroke} strokeWidth={1} />
       {/* openings */}
       {wall.openings.map((op) => {
         const b = openingBoxes(g, side).find((x) => x.o.id === op.id)!;
         const glass = tone === "blueprint" ? "transparent" : ink ? (op.kind === "door" ? "rgba(43,42,39,0.08)" : "rgba(95,141,181,0.07)") : op.kind === "door" ? "#4a3b2e" : variant.scene.lighting === "evening" ? "#f2c879" : "#9fb0ba";
         return (
           <g key={op.id}>
-            <rect pathLength={1} x={X(b.left)} y={Y(b.top)} width={op.width * S} height={op.height * S} fill={glass} stroke={stroke} strokeWidth={1} />
+            <rect className="op" pathLength={1} x={X(b.left)} y={Y(b.top)} width={op.width * S} height={op.height * S} fill={glass} stroke={stroke} strokeWidth={1} />
             {op.kind === "window" ? (
               <>
-                <line pathLength={1} x1={X(op.x)} x2={X(op.x)} y1={Y(b.top)} y2={Y(b.bottom)} stroke={stroke} strokeWidth={0.8} />
-                <line pathLength={1} x1={X(b.left)} x2={X(b.right)} y1={Y(b.top - op.height * 0.3)} y2={Y(b.top - op.height * 0.3)} stroke={stroke} strokeWidth={0.8} />
+                <line className="op" pathLength={1} x1={X(op.x)} x2={X(op.x)} y1={Y(b.top)} y2={Y(b.bottom)} stroke={stroke} strokeWidth={0.8} />
+                <line className="op" pathLength={1} x1={X(b.left)} x2={X(b.right)} y1={Y(b.top - op.height * 0.3)} y2={Y(b.top - op.height * 0.3)} stroke={stroke} strokeWidth={0.8} />
               </>
             ) : (
               <line x1={X(op.x)} x2={X(op.x)} y1={Y(b.top)} y2={Y(b.bottom)} stroke={tone === "blueprint" ? stroke : "#2b221a"} strokeWidth={0.8} />

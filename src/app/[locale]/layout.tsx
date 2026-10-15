@@ -24,7 +24,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
     <I18nProvider locale={locale as Locale} dict={dict}>
       <CatalogDataProvider products={products} categories={categories} prices={prices}>
         <ToastProvider>
-          <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[300] focus:bg-ink focus:px-4 focus:py-2 focus:text-white">
+          <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[300] focus:bg-ink focus:px-4 focus:py-2 focus:text-paper">
             {dict.nav.skip}
           </a>
           <Header />

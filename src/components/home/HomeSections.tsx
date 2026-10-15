@@ -23,7 +23,7 @@ export function DetailsShowcase() {
         <div className={`relative overflow-hidden bg-[#d6cfc3] ${big ? "aspect-[4/5] lg:aspect-auto lg:min-h-[460px] lg:flex-1" : "aspect-[4/3]"}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={productImage(p)} alt={lt(p.name, locale)} loading="lazy" className={`zoom-img h-full w-full ${big ? "absolute inset-0 object-contain" : "object-cover"}`} />
-          <span className="absolute top-3 left-3 bg-ink/70 px-2 py-1 text-[10px] tracking-[0.18em] text-white uppercase">3D · DEMO</span>
+          <span className="absolute top-3 left-3 bg-black/60 px-2 py-1 text-[10px] tracking-[0.18em] text-white uppercase">3D · DEMO</span>
         </div>
         <div className="mt-4 flex items-baseline justify-between gap-4">
           <div>
@@ -36,7 +36,7 @@ export function DetailsShowcase() {
     </Reveal>
   );
   return (
-    <section className="bg-ink py-24 text-white sm:py-32">
+    <section className="bg-deep py-24 text-white sm:py-32">
       <div className="container-x">
         <div className="mb-14 flex flex-wrap items-end justify-between gap-6">
           <div>
@@ -77,7 +77,7 @@ export function CategoryIndex({ categories, counts }: { categories: Category[]; 
               href={`/${locale}/catalog/${c.slug}/`}
               onMouseEnter={() => setHover(c.id)}
               onFocus={() => setHover(c.id)}
-              className="group grid grid-cols-[48px_1fr_auto] items-baseline gap-4 border-b border-line py-5 transition-colors hover:bg-white/60 sm:py-6"
+              className="group grid grid-cols-[48px_1fr_auto] items-baseline gap-4 border-b border-line py-5 transition-colors hover:bg-surface/60 sm:py-6"
             >
               <span className="dim">{String(i + 1).padStart(2, "0")}</span>
               <span className="font-display text-[26px] leading-tight transition-transform duration-500 ease-[var(--ease-out-expo)] group-hover:translate-x-2 sm:text-[34px]">

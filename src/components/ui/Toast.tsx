@@ -27,7 +27,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             key={t.id}
             role={t.tone === "danger" ? "alert" : "status"}
             className={`pointer-events-auto flex max-w-sm items-start gap-2 border px-4 py-3 text-sm shadow-[var(--shadow-lift)] animate-[toastIn_var(--duration-base)_var(--ease-arch)] ${
-              t.tone === "danger" ? "border-danger/40 bg-danger-soft" : t.tone === "warn" ? "border-warn/40 bg-warn-soft" : "border-ink bg-ink text-white"
+              t.tone === "danger" ? "border-danger/40 bg-danger-soft" : t.tone === "warn" ? "border-warn/40 bg-warn-soft" : "border-ink bg-ink text-paper"
             }`}
           >
             <Icon name={t.tone === "ok" ? "check" : t.tone === "info" ? "info" : "warn"} size={16} className="mt-0.5 shrink-0" />

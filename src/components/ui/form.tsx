@@ -47,7 +47,7 @@ export function Field({
 }
 
 const inputBase =
-  "h-10 w-full border bg-white px-3 text-sm text-ink placeholder:text-ink-4 transition-colors duration-[var(--duration-fast)] focus:border-ink focus:outline-none disabled:bg-stone disabled:text-ink-4";
+  "h-10 w-full border bg-surface px-3 text-sm text-ink placeholder:text-ink-4 transition-colors duration-[var(--duration-fast)] focus:border-ink focus:outline-none disabled:bg-stone disabled:text-ink-4";
 
 export function Input({ invalid, className = "", ...rest }: ComponentProps<"input"> & { invalid?: boolean }) {
   return <input className={`${inputBase} ${invalid ? "border-danger" : "border-line-strong"} ${className}`} aria-invalid={invalid || undefined} {...rest} />;
@@ -144,11 +144,11 @@ export function Segmented<T extends string>({
   size?: "sm" | "md";
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="inline-flex flex-wrap border border-line-strong bg-white p-0.5">
+    <div role="radiogroup" aria-label={label} className="inline-flex flex-wrap border border-line-strong bg-surface p-0.5">
       {options.map((o) => (
         <label
           key={o.value}
-          className={`relative cursor-pointer ${size === "sm" ? "px-2.5 py-1 text-xs" : "px-3 py-1.5 text-[13px]"} transition-colors has-[:checked]:bg-ink has-[:checked]:text-white has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-40 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-bronze`}
+          className={`relative cursor-pointer ${size === "sm" ? "px-2.5 py-1 text-xs" : "px-3 py-1.5 text-[13px]"} transition-colors has-[:checked]:bg-ink has-[:checked]:text-paper has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-40 has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-bronze`}
         >
           <input
             type="radio"

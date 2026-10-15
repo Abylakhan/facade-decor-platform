@@ -21,7 +21,7 @@ export function PresetGrid() {
   return (
     <ul className="grid gap-6 md:grid-cols-2">
       {built.map(({ p, v }) => (
-        <li key={p.slug} className="group relative border border-line bg-white">
+        <li key={p.slug} className="group relative border border-line bg-surface">
           <div className="paper-grid border-b border-line bg-paper p-4">
             <FacadeElevation variant={v} product={product} className="h-64 w-full" dims={false} />
           </div>
@@ -59,7 +59,7 @@ export function PresetDetail({ slug }: { slug: string }) {
         <BeforeAfter variant={v} labels={{ before, after, slider: dict.home.beforeAfter }} />
         <div className="grid gap-4 sm:grid-cols-2">
           {(["right", "back"] as const).map((s) => (
-            <figure key={s} className="border border-line bg-white p-2">
+            <figure key={s} className="border border-line bg-surface p-2">
               <figcaption className="dim mb-1">{dict.sides[s]}</figcaption>
               <FacadeElevation variant={v} product={product} side={s} className="w-full" />
             </figure>

@@ -20,3 +20,17 @@ official API (api.polyhaven.com → dl.polyhaven.org) and are licensed **CC0 1.0
 parametric product models (src/components/three/ProductModel.tsx) with the textures
 above — not photographs. Regenerate in development: `node scripts/render-save-server.mjs`
 and open `/render-lab/` (dev only).
+
+## Home-page scroll sequence (`public/hero/`)
+
+Built from two Pixabay videos by the same author, sharing scene, camera and house:
+
+| Source | Use |
+|---|---|
+| https://pixabay.com/videos/home-architecture-design-31290/ | wireframe house growing; the blueprint stage is *extracted from these frames* (line mask, recoloured on dark) |
+| https://pixabay.com/videos/home-3d-architecture-design-31289/ | the same house built out with materials and a tiled roof |
+
+License: **Pixabay Content License** (free for commercial use, no attribution required;
+the clips are not redistributed as standalone stock — they are cut, cross-faded, cropped and
+re-encoded into a 124-frame WebP sequence: `hero/d` 1440×810, `hero/m` 800×450).
+A credit line is shown on the hero anyway.

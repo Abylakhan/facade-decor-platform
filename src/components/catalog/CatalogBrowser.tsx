@@ -171,9 +171,11 @@ export function CatalogBrowser({ fixedCategory }: { fixedCategory?: CategoryId }
             />
           </div>
         ) : (
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {results.map((p) => (
-              <ProductCard key={p.id} product={p} onQuickView={setQuick} />
+          <div key={results.map((p) => p.id).join("|")} className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {results.map((p, i) => (
+              <div key={p.id} className="step-in" style={{ animationDelay: `${Math.min(i, 9) * 45}ms` }}>
+                <ProductCard product={p} onQuickView={setQuick} />
+              </div>
             ))}
           </div>
         )}
@@ -187,7 +189,7 @@ export function CatalogBrowser({ fixedCategory }: { fixedCategory?: CategoryId }
       </div>
       {filtersOpen && (
         <div className="fixed inset-0 z-[90] flex lg:hidden" role="dialog" aria-modal="true" aria-label={dict.catalog.filters}>
-          <div className="absolute inset-0 bg-ink/50" onClick={() => setFiltersOpen(false)} />
+          <div className="absolute inset-0 bg-black/65" onClick={() => setFiltersOpen(false)} />
           <div className="relative mr-auto h-full w-[86%] max-w-sm overflow-auto bg-paper p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="font-display text-2xl">{dict.catalog.filters}</h2>

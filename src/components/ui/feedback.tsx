@@ -3,7 +3,7 @@ import { Icon, type IconName } from "./icons";
 
 export function Badge({ children, tone = "neutral", className = "" }: { children: ReactNode; tone?: "neutral" | "bronze" | "demo" | "ok" | "warn" | "danger"; className?: string }) {
   const tones = {
-    neutral: "border-line-strong text-ink-3 bg-white",
+    neutral: "border-line-strong text-ink-3 bg-surface",
     bronze: "border-bronze/40 text-bronze bg-bronze-soft",
     demo: "border-warn/40 text-warn bg-warn-soft",
     ok: "border-ok/30 text-ok bg-ok-soft",
@@ -15,7 +15,7 @@ export function Badge({ children, tone = "neutral", className = "" }: { children
 
 export function Alert({ tone = "info", title, children, className = "" }: { tone?: "info" | "warn" | "danger" | "ok"; title?: ReactNode; children?: ReactNode; className?: string }) {
   const map: Record<string, [string, IconName]> = {
-    info: ["border-line-strong bg-white text-ink-2", "info"],
+    info: ["border-line-strong bg-surface text-ink-2", "info"],
     warn: ["border-warn/40 bg-warn-soft text-ink-2", "warn"],
     danger: ["border-danger/40 bg-danger-soft text-ink-2", "warn"],
     ok: ["border-ok/30 bg-ok-soft text-ink-2", "check"],

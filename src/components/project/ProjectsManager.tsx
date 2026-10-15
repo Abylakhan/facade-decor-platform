@@ -83,7 +83,7 @@ export function ProjectsManager() {
             const v = activeVariant(pr);
             const e = buildEstimate(v, product, prices);
             return (
-              <li key={pr.id} className="flex flex-col border border-line bg-white">
+              <li key={pr.id} className="flex flex-col border border-line bg-surface">
                 <div className="paper-grid border-b border-line bg-paper p-3">
                   <FacadeElevation variant={v} product={product} className="h-44 w-full" dims={false} />
                 </div>

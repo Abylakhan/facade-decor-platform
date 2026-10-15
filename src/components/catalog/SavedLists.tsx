@@ -75,7 +75,7 @@ export function CompareTable() {
             <th className="w-44" />
             {items.map((p) => (
               <th key={p.id} className="!normal-case !tracking-normal">
-                <div className="paper-grid mb-2 aspect-[4/3] border border-line bg-white p-2">
+                <div className="paper-grid mb-2 aspect-[4/3] border border-line bg-surface p-2">
                   <ProductDrawing product={p} className="h-full w-full" />
                 </div>
                 <Link href={`/${locale}/product/${p.slug}/`} className="link text-sm font-medium text-ink">

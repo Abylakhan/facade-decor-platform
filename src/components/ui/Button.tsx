@@ -6,13 +6,13 @@ type Variant = "primary" | "secondary" | "ghost" | "bronze" | "danger" | "light"
 type Size = "sm" | "md" | "lg" | "icon";
 
 const base =
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-[background,color,border-color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-arch)] disabled:pointer-events-none disabled:opacity-45 select-none";
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap font-medium transition-[background,color,border-color,box-shadow,transform] duration-[var(--duration-fast)] ease-[var(--ease-arch)] disabled:pointer-events-none disabled:opacity-45 select-none active:scale-[0.97] focus-visible:ring-2 focus-visible:ring-bronze/60 focus-visible:ring-offset-2 focus-visible:ring-offset-paper";
 const variants: Record<Variant, string> = {
-  primary: "bg-ink text-white hover:bg-ink-2 border border-ink",
-  secondary: "border border-line-strong bg-white text-ink hover:border-ink",
+  primary: "bg-ink text-paper hover:bg-ink-2 border border-ink",
+  secondary: "border border-line-strong bg-surface text-ink hover:border-ink",
   ghost: "text-ink hover:bg-stone border border-transparent",
   bronze: "bg-bronze text-white hover:bg-bronze-2 border border-bronze",
-  danger: "border border-danger/40 text-danger hover:bg-danger-soft bg-white",
+  danger: "border border-danger/40 text-danger hover:bg-danger-soft bg-surface",
   light: "border border-white/40 text-white hover:bg-white/10",
 };
 const sizes: Record<Size, string> = {

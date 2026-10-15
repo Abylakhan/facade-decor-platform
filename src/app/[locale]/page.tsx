@@ -1,7 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { HeroDrawing } from "@/components/home/HeroDrawing";
-import { CategoryIndex, DetailsShowcase } from "@/components/home/HomeSections";
+import { HeroSequence } from "@/components/home/HeroSequence";
+import { CategoryIndex } from "@/components/home/HomeSections";
+import { CtaScroll, HorizontalShowcase, ProcessTimeline, ScrollText } from "@/components/home/ScrollSections";
 import { PresetTeaser } from "@/components/home/PresetTeaser";
 import { Reveal, RevealWords } from "@/components/motion/Reveal";
 import { buttonClass } from "@/components/ui/Button";
@@ -27,16 +28,24 @@ export default async function Home({ params }: LocaleParams) {
 
   return (
     <main>
-      <HeroDrawing />
+      <HeroSequence />
 
-      <DetailsShowcase />
+      {/* manifesto: words light up with scroll */}
+      <section className="container-x py-28 sm:py-40">
+        <Reveal kind="fade">
+          <p className="eyebrow mb-8">01 · Atelier Façade</p>
+        </Reveal>
+        <ScrollText text={dict.home.manifesto} />
+      </section>
 
-      {/* manifesto + tools */}
+      <HorizontalShowcase />
+
+      {/* tools */}
       <section className="container-x py-24 sm:py-32">
         <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
           <div>
             <Reveal kind="fade">
-              <p className="eyebrow">01 · Platform</p>
+              <p className="eyebrow">03 · Platform</p>
             </Reveal>
             <RevealWords text={dict.home.pillarsTitle} className="display-2 mt-5" />
           </div>
@@ -57,12 +66,12 @@ export default async function Home({ params }: LocaleParams) {
         </div>
       </section>
 
-      <section className="border-t border-line bg-white py-24 sm:py-32">
+      <section className="border-y border-line bg-surface py-24 sm:py-32">
         <div className="container-x">
           <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
             <div>
               <Reveal kind="fade">
-                <p className="eyebrow">02 · Catalog</p>
+                <p className="eyebrow">04 · Catalog</p>
               </Reveal>
               <RevealWords text={dict.home.categoriesTitle} className="display-2 mt-5" />
             </div>
@@ -76,27 +85,16 @@ export default async function Home({ params }: LocaleParams) {
 
       <section className="container-x py-24 sm:py-32">
         <Reveal kind="fade">
-          <p className="eyebrow">03 · Process</p>
+          <p className="eyebrow">05 · Process</p>
         </Reveal>
         <RevealWords text={dict.home.howTitle} className="display-2 mt-5" />
-        <ol className="mt-14 grid gap-10 md:grid-cols-4">
-          {dict.home.how.map((s, i) => (
-            <Reveal as="li" key={s.title} kind="up" delay={i * 110} className="relative pt-6">
-              <Reveal kind="line" delay={i * 110 + 150} className="absolute top-0 left-0 h-px w-full bg-ink">
-                <span />
-              </Reveal>
-              <span className="font-display text-6xl font-light text-bronze">{i + 1}</span>
-              <h3 className="mt-4 text-lg font-medium">{s.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-3">{s.text}</p>
-            </Reveal>
-          ))}
-        </ol>
+        <ProcessTimeline />
       </section>
 
       <section className="paper-grid border-y border-line bg-paper py-24 sm:py-32">
         <div className="container-x">
           <Reveal kind="fade">
-            <p className="eyebrow">04 · {dict.home.beforeAfter}</p>
+            <p className="eyebrow">06 · {dict.home.beforeAfter}</p>
           </Reveal>
           <RevealWords text={dict.home.portfolioTitle} className="display-2 mt-5 mb-12" />
           <Reveal kind="up">
@@ -108,7 +106,7 @@ export default async function Home({ params }: LocaleParams) {
       <section className="container-x grid gap-10 py-24 sm:py-32 lg:grid-cols-[1fr_2fr]">
         <div>
           <Reveal kind="fade">
-            <p className="eyebrow">05 · FAQ</p>
+            <p className="eyebrow">07 · FAQ</p>
           </Reveal>
           <RevealWords text={dict.nav.faq} className="display-2 mt-5" />
         </div>
@@ -127,25 +125,16 @@ export default async function Home({ params }: LocaleParams) {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-ink py-28 text-white sm:py-36">
-        <div className="blueprint-grid pointer-events-none absolute inset-0 opacity-40" aria-hidden="true" />
-        <div className="container-x relative flex flex-col items-start gap-8 md:flex-row md:items-end md:justify-between">
-          <div>
-            <RevealWords text={dict.home.ctaTitle} className="display-2 max-w-2xl !text-white" />
-            <Reveal kind="fade" delay={200}>
-              <p className="mt-5 max-w-xl text-white/65">{dict.home.ctaText}</p>
-            </Reveal>
-          </div>
-          <Reveal kind="up" delay={250} className="flex flex-wrap gap-3">
-            <Link href={L("/configurator/")} className={buttonClass("bronze", "lg")}>
-              {dict.home.ctaCreate}
-            </Link>
-            <Link href={L("/calculator/")} className={buttonClass("light", "lg")}>
-              {dict.home.ctaCalc}
-            </Link>
-          </Reveal>
+      <CtaScroll title={dict.home.ctaTitle} text={dict.home.ctaText}>
+        <div className="flex flex-wrap gap-3">
+          <Link href={L("/configurator/")} className={buttonClass("bronze", "lg")}>
+            {dict.home.ctaCreate}
+          </Link>
+          <Link href={L("/calculator/")} className={buttonClass("light", "lg")}>
+            {dict.home.ctaCalc}
+          </Link>
         </div>
-      </section>
+      </CtaScroll>
     </main>
   );
 }

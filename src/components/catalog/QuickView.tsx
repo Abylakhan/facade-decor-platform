@@ -16,7 +16,7 @@ export function QuickView({ product, onClose }: { product: Product | null; onClo
   return (
     <Modal open onClose={onClose} title={lt(product.name, locale)} wide closeLabel={dict.nav.close}>
       <div className="grid gap-6 md:grid-cols-2">
-        <div className="paper-grid flex aspect-square items-center justify-center border border-line bg-white p-6">
+        <div className="paper-grid flex aspect-square items-center justify-center border border-line bg-surface p-6">
           <ProductDrawing product={product} className="h-full w-full" title={dict.product.drawing} />
         </div>
         <div className="flex flex-col gap-4">

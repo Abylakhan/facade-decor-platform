@@ -199,7 +199,7 @@ export function LeadForm({
               accept={ALLOWED_FILE_TYPES.join(",")}
               onChange={(x) => onFiles(x.target.files)}
               aria-describedby={describedBy}
-              className="block w-full text-sm file:mr-3 file:border file:border-line-strong file:bg-white file:px-3 file:py-2 file:text-sm"
+              className="block w-full text-sm file:mr-3 file:border file:border-line-strong file:bg-surface file:px-3 file:py-2 file:text-sm"
             />
           )}
         </Field>

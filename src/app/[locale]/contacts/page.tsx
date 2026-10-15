@@ -26,7 +26,7 @@ export default async function ContactsPage({ params }: LocaleParams) {
             ))}
           </dl>
         </div>
-        <div className="border border-line bg-white p-6">
+        <div className="border border-line bg-surface p-6">
           <h2 className="display-3 mb-4">{dict.lead.consultTitle}</h2>
           <LeadForm compact />
         </div>

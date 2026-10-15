@@ -54,7 +54,7 @@ export function Modal({
   if (!open || typeof document === "undefined") return null;
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-end justify-center sm:items-center sm:p-6">
-      <div className="absolute inset-0 bg-ink/50 animate-[fadeIn_var(--duration-base)_ease-out]" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-black/65 animate-[fadeIn_var(--duration-base)_ease-out]" onClick={onClose} aria-hidden="true" />
       <div
         ref={ref}
         role="dialog"

@@ -26,7 +26,7 @@ export function FavCompareButtons({ product, compact = false }: { product: Produ
         aria-pressed={isFav}
         aria-label={isFav ? dict.common.unfavorite : dict.common.favorite}
         title={isFav ? dict.common.unfavorite : dict.common.favorite}
-        className={`inline-flex ${cls} items-center justify-center border border-line-strong bg-white transition-colors hover:border-ink ${isFav ? "text-bronze" : ""}`}
+        className={`inline-flex ${cls} items-center justify-center border border-line-strong bg-surface transition-colors hover:border-ink ${isFav ? "text-bronze" : ""}`}
       >
         <Icon name="heart" fill={isFav ? "currentColor" : "none"} />
       </button>
@@ -38,7 +38,7 @@ export function FavCompareButtons({ product, compact = false }: { product: Produ
         aria-pressed={isCmp}
         aria-label={isCmp ? dict.common.uncompare : dict.common.compare}
         title={isCmp ? dict.common.uncompare : dict.common.compare}
-        className={`inline-flex ${cls} items-center justify-center border border-line-strong bg-white transition-colors hover:border-ink ${isCmp ? "bg-ink text-white" : ""}`}
+        className={`inline-flex ${cls} items-center justify-center border border-line-strong bg-surface transition-colors hover:border-ink ${isCmp ? "bg-ink text-paper" : ""}`}
       >
         <Icon name="compare" />
       </button>

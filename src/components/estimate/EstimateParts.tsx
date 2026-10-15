@@ -6,6 +6,7 @@ import { useI18n } from "@/lib/i18n-context";
 import { useCatalog } from "@/lib/catalog-context";
 import { useCalcMessage } from "@/lib/use-messages";
 import { Icon } from "@/components/ui/icons";
+import { AnimatedNumber } from "@/components/motion/AnimatedNumber";
 import { NumberInput } from "@/components/ui/form";
 
 export function StepList({ steps }: { steps: CalcStep[] }) {
@@ -60,7 +61,10 @@ export function Totals({ estimate, large = false }: { estimate: Estimate; large?
   const row = (label: string, v: number, neg = false) => (
     <div className="flex justify-between gap-4 py-1.5 text-sm">
       <span className="text-ink-3">{label}</span>
-      <span className="num">{neg && v ? "−" : ""}{fmtMoney(v, locale)}</span>
+      <span className="num">
+        {neg && v ? "−" : ""}
+        <AnimatedNumber value={v} format={(n) => fmtMoney(n, locale)} />
+      </span>
     </div>
   );
   return (
@@ -72,8 +76,8 @@ export function Totals({ estimate, large = false }: { estimate: Estimate; large?
       {t.discount !== 0 && row(dict.calc.discount, t.discount, true)}
       <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-ink pt-3">
         <span className="text-sm font-medium">{t.hasUnpriced ? dict.calc.totalPartial : dict.calc.total}</span>
-        <span key={t.total} className={`flash num px-1 font-display ${large ? "text-4xl" : "text-3xl"}`} aria-live="polite">
-          {fmtMoney(t.total, locale)}
+        <span className={`num px-1 font-display ${large ? "text-4xl" : "text-3xl"}`} aria-live="polite">
+          <AnimatedNumber value={t.total} format={(n) => fmtMoney(n, locale)} />
         </span>
       </div>
       <p className="mt-2 text-[11px] text-ink-4">
@@ -98,7 +102,7 @@ export function Metrics({ estimate }: { estimate: Estimate }) {
   return (
     <dl className="grid grid-cols-2 gap-px bg-line sm:grid-cols-4">
       {items.map(([k, v]) => (
-        <div key={k} className="bg-white p-3">
+        <div key={k} className="bg-surface p-3">
           <dt className="dim">{k}</dt>
           <dd className="num mt-1 text-lg">{v}</dd>
         </div>

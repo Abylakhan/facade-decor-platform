@@ -35,7 +35,7 @@ export function Hint({ children, label = "?" }: { children: ReactNode; label?: s
         <span
           id={id}
           role="tooltip"
-          className="absolute top-6 left-1/2 z-40 w-64 -translate-x-1/2 border border-line bg-white p-3 text-xs leading-relaxed font-normal text-ink-2 shadow-[var(--shadow-lift)] normal-case tracking-normal"
+          className="absolute top-6 left-1/2 z-40 w-64 -translate-x-1/2 border border-line bg-surface p-3 text-xs leading-relaxed font-normal text-ink-2 shadow-[var(--shadow-lift)] normal-case tracking-normal"
         >
           {children}
         </span>

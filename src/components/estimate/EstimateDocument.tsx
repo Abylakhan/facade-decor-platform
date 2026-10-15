@@ -122,7 +122,7 @@ export function EstimateDocument() {
       )}
 
       {/* document */}
-      <div className="border border-line bg-white p-6 sm:p-10 print:border-0 print:p-0">
+      <div className="border border-line bg-surface p-6 sm:p-10 print:border-0 print:p-0">
         <header className="flex flex-wrap items-start justify-between gap-6 border-b border-ink pb-6">
           <div>
             <p className="eyebrow">{site.brand}</p>

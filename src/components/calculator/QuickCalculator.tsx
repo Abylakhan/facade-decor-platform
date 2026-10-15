@@ -144,7 +144,7 @@ export function QuickCalculator() {
               <legend className="mb-3 text-[13px] font-medium">{dict.configurator.buildingType}</legend>
               <div className="grid gap-2 sm:grid-cols-3">
                 {(Object.keys(dict.building) as BuildingType[]).map((b) => (
-                  <label key={b} className={`cursor-pointer border p-4 transition-colors has-[:checked]:border-ink has-[:checked]:bg-white has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-bronze ${type === b ? "" : "border-line hover:border-line-strong"}`}>
+                  <label key={b} className={`cursor-pointer border p-4 transition-colors has-[:checked]:border-ink has-[:checked]:bg-surface has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-bronze ${type === b ? "" : "border-line hover:border-line-strong"}`}>
                     <input type="radio" name="btype" className="sr-only" checked={type === b} onChange={() => setType(b)} />
                     <span className="font-display text-xl">{dict.building[b]}</span>
                   </label>
@@ -199,7 +199,7 @@ export function QuickCalculator() {
               const opts = productsFor(kind, products);
               const on = !!decor[kind];
               return (
-                <div key={kind} className={`grid items-center gap-3 border p-3 sm:grid-cols-[1fr_1.2fr] ${on ? "border-ink bg-white" : "border-line"}`}>
+                <div key={kind} className={`grid items-center gap-3 border p-3 sm:grid-cols-[1fr_1.2fr] ${on ? "border-ink bg-surface" : "border-line"}`}>
                   <div>
                     <Checkbox label={dict.placement[kind]} checked={on} onChange={(e) => setDecor((d) => ({ ...d, [kind]: e.target.checked ? opts[0]?.id : undefined }))} />
                     <p className="mt-1 pl-6 text-xs text-ink-4">{dict.placementHint[kind]}</p>
@@ -227,7 +227,7 @@ export function QuickCalculator() {
                 {(Object.keys(dict.package) as PackageOption[]).map((p) => {
                   const disabled = p === "turnkey" && !prices.turnkeyAvailable;
                   return (
-                    <label key={p} className={`border p-4 has-[:checked]:border-ink has-[:checked]:bg-white ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
+                    <label key={p} className={`border p-4 has-[:checked]:border-ink has-[:checked]:bg-surface ${disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"}`}>
                       <input type="radio" name="pkg" className="sr-only" disabled={disabled} checked={opts.package === p} onChange={() => setOpts((o) => ({ ...o, package: p }))} />
                       <span className="block font-medium">{dict.package[p]}</span>
                       <span className="mt-1 block text-xs text-ink-4">{dict.packageHint[p]}</span>
@@ -263,7 +263,7 @@ export function QuickCalculator() {
           <div className="space-y-10">
             {usedTypical && <Alert tone="warn">{k.typicalAssumption}</Alert>}
             <Metrics estimate={estimate} />
-            <figure className="border border-line bg-white p-3">
+            <figure className="border border-line bg-surface p-3">
               <figcaption className="dim mb-2">{dict.estimate.schema} · {dict.sides.front}</figcaption>
               <FacadeElevation variant={project.variants[0]!} product={product} className="w-full" />
             </figure>
@@ -279,7 +279,7 @@ export function QuickCalculator() {
             )}
             <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr]">
               <Messages estimate={estimate} />
-              <div className="border border-line bg-white p-5">
+              <div className="border border-line bg-surface p-5">
                 <Totals estimate={estimate} large />
               </div>
             </div>

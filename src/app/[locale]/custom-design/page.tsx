@@ -29,7 +29,7 @@ export default async function CustomPage({ params }: LocaleParams) {
       <PageHeader crumbsLabel={dict.common.breadcrumbs} crumbs={[{ href: `/${locale}/`, label: dict.nav.home }, { label: dict.nav.customDesign }]} title={dict.pages.customTitle} />
       <section className="container-x grid gap-12 lg:grid-cols-2">
         <TextBlocks blocks={copy[locale]} />
-        <div className="border border-line bg-white p-6">
+        <div className="border border-line bg-surface p-6">
           <h2 className="display-3 mb-4">{dict.lead.title}</h2>
           <LeadForm initialComment={dict.pages.customTitle} />
         </div>

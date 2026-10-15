@@ -60,7 +60,7 @@ export function SelectionEditor({
   );
 
   return (
-    <div className={`border bg-white ${messages.some((m) => m.severity === "error") ? "border-danger/50" : "border-line"}`}>
+    <div className={`border bg-surface ${messages.some((m) => m.severity === "error") ? "border-danger/50" : "border-line"}`}>
       <div className="flex items-center gap-2 p-3">
         <input
           type="checkbox"
@@ -218,7 +218,7 @@ export function AddDecor({ g, onAdd }: { g: HouseGeometry; onAdd: (s: DecorSelec
         type="button"
         disabled={!chosen}
         onClick={() => chosen && onAdd({ id: `s-${Date.now().toString(36)}`, productId: chosen.id, enabled: true, placement: defaultPlacement(kind, g, chosen) })}
-        className="inline-flex h-9 w-full items-center justify-center gap-2 bg-ink text-sm text-white hover:bg-ink-2 disabled:opacity-40"
+        className="inline-flex h-9 w-full items-center justify-center gap-2 bg-ink text-sm text-paper hover:bg-ink-2 disabled:opacity-40"
       >
         <Icon name="plus" size={16} />
         {dict.common.add}
